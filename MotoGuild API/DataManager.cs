@@ -1,4 +1,7 @@
-﻿using MotoGuild_API.Models;
+﻿using MotoGuild_API.Models.Event;
+using MotoGuild_API.Models.Group;
+using MotoGuild_API.Models.Ride;
+using MotoGuild_API.Models.Route;
 using MotoGuild_API.Models.User;
 
 namespace MotoGuild_API

@@ -1,4 +1,9 @@
-﻿namespace MotoGuild_API.Models.User
+﻿using MotoGuild_API.Models.Event;
+using MotoGuild_API.Models.Group;
+using MotoGuild_API.Models.Ride;
+using MotoGuild_API.Models.Route;
+
+namespace MotoGuild_API.Models.User
 {
     public class UserDto
     {

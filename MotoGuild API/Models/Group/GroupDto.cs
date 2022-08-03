@@ -1,4 +1,4 @@
-﻿namespace MotoGuild_API.Models
+﻿namespace MotoGuild_API.Models.Group
 {
     public class GroupDto
     {

@@ -1,4 +1,4 @@
-﻿namespace MotoGuild_API.Models
+﻿namespace MotoGuild_API.Models.Ride
 {
     public class RideDto
     {
