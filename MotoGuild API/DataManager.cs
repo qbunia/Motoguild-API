@@ -21,7 +21,7 @@ namespace MotoGuild_API
             };
             UsersWithSelectedData = new List<UserSelectedDataDto>()
             {
-                new UserSelectedDataDto(){Id = 1, UserName = "Xzibit", Email = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9}
+                new UserSelectedDataDto(){Id = 1, UserName = "Xzibit", Email = "xzibit@gmail.com", Rating = 4.9}
             };
             Groups = new List<GroupDto>();
             Events = new List<EventDto>();
