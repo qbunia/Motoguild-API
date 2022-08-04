@@ -13,6 +13,7 @@ namespace MotoGuild_API
         public List<UserDto> Users { get; set; }
         public List<GroupDto> Groups { get; set; }
         public List<EventDto> Events { get; set; }
+        public List<EventSelectedDataDto> EventSelectedData { get; set; }
         public List<RideDto> Rides { get; set; }
         public List<RouteDto> Routes { get; set; }
 
@@ -34,6 +35,7 @@ namespace MotoGuild_API
                 }
             };
             Events = new List<EventDto>();
+            EventSelectedData = new List<EventSelectedDataDto>();
             Routes = new List<RouteDto>();
             Rides = new List<RideDto>();
         }
