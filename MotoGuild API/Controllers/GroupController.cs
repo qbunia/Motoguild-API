@@ -30,6 +30,11 @@ namespace MotoGuild_API.Controllers
         [HttpPost]
         public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
         {
+            if (DataManager.Current.Users.FirstOrDefault(u=>u.Id == createGroupDto.OwnerId) == null)
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
