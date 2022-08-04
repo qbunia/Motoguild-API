@@ -1,5 +1,6 @@
 ﻿using MotoGuild_API.Models.Event;
 using MotoGuild_API.Models.Group;
+using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.Ride;
 using MotoGuild_API.Models.Route;
 using MotoGuild_API.Models.User;
@@ -15,16 +16,32 @@ namespace MotoGuild_API
         public List<RideDto> Rides { get; set; }
         public List<RouteDto> Routes { get; set; }
 
+        private UserDto _firstUser = new UserDto()
+            { Id = 1, UserName = "Xzibit", Email = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9 };
+
         public DataManager()
         {
             Users = new List<UserDto>()
             {
-                new UserDto(){Id = 1, UserName = "Xzibit",Email  = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9}
+               _firstUser
             };
-            Groups = new List<GroupDto>();
+            Groups = new List<GroupDto>()
+            {
+                new GroupDto()
+                {
+                    Id = 1, IsPrivate = true, Members = new List<UserSelectedDataDto>(), Name = "MC", Owner = GetFirstUserWithSelectedData(), 
+                    CreationDate = DateTime.Now, PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
+                }
+            };
             Events = new List<EventDto>();
             Routes = new List<RouteDto>();
             Rides = new List<RideDto>();
+        }
+
+        private UserSelectedDataDto GetFirstUserWithSelectedData()
+        {
+            return new UserSelectedDataDto()
+                { Email = _firstUser.Email, Rating = _firstUser.Rating, Id = _firstUser.Id, UserName = _firstUser.UserName };
         }
 
     }
