@@ -1,4 +1,6 @@
-﻿namespace MotoGuild_API.Models.Route
+﻿using MotoGuild_API.Models.Post;
+using MotoGuild_API,Models.Stops;
+namespace MotoGuild_API.Models.Route
 {
     public class RouteDto
     {
