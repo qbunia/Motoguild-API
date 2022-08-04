@@ -8,7 +8,7 @@ namespace MotoGuild_API.Models.Route
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public ICollection<StopsDto>? Stops { get; set; }
+        public ICollection<StopDto>? Stops { get; set; }
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
