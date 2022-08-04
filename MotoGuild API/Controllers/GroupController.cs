@@ -30,7 +30,7 @@ namespace MotoGuild_API.Controllers
         [HttpPost]
         public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
         {
-            if (!OwnerExists(createGroupDto))
+            if (!UserExists(createGroupDto.OwnerId))
             {
                 ModelState.AddModelError(key: "Description", errorMessage: "User not found");
             }
@@ -45,15 +45,41 @@ namespace MotoGuild_API.Controllers
             return CreatedAtRoute("GetGroup", new { id = group.Id }, group);
         }
 
-        [HttpPut]
-        public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto)
+        [HttpPut("{id:int}")]
+        public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto, int id)
         {
+            if (!UserExists(addMemberDto.MemberId))
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
+            }
+            var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
+            if (group == null)
+            {
+                return NotFound();
+            }
+            if (group.Members.Any(u => u.Id == addMemberDto.MemberId) || group.Owner.Id == addMemberDto.MemberId)
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User is already in group");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            var memberSelectedData = new UserSelectedDataDto()
+                { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            group.Members.Add(memberSelectedData);
+            member.Groups.Add(group);
+            return NoContent();
+
+
 
         }
 
-        private bool OwnerExists(CreateGroupDto createGroupDto)
+        private bool UserExists(int id)
         {
-            return DataManager.Current.Users.FirstOrDefault(u => u.Id == createGroupDto.OwnerId) != null;
+            return DataManager.Current.Users.FirstOrDefault(u => u.Id == id) != null;
         }
 
         private GroupDto SaveGroupToDataManager(CreateGroupDto createGroupDto, int id)
