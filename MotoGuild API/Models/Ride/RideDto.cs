@@ -13,7 +13,7 @@ namespace MotoGuild_API.Models.Ride
         public ICollection<UserSelectedDataDto>? Participants { get; set; } = new List<UserSelectedDataDto>();
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
-        public ICollection<Stops.StopDto>? Stops { get; set; }
+        public ICollection<StopDto>? Stops { get; set; }
         public DateTime StartTime { get; set; }
         public int Estimation { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
