@@ -9,8 +9,6 @@ namespace MotoGuild_API.Models.Event
         [Required]
         public string Name { get; set; }
         [Required]
-        public int OwnerId { get; set; }
-        [Required]
         public string Description { get; set; } = String.Empty;
         public ICollection<UserSelectedDataDto>? Participants { get; set; } = new List<UserSelectedDataDto>();
         [Required]

@@ -34,7 +34,8 @@ namespace MotoGuild_API.Controllers
             }
             int newId = GetNewId();
             var events = SaveEventToDataManager(createEventDto, newId);
-            SaveEventSelectedDataToDataManager(createEventDto, newId);
+            var owner = DataManager.Current.Users.FirstOrDefault(u=> u.Id == events.Owner.Id);
+            owner.Events.Add(events);
             return CreatedAtRoute("GetEvent", new { id = events.Id }, events);
         }
 
@@ -74,7 +75,6 @@ namespace MotoGuild_API.Controllers
         {
 
             eventDto.Name = updateEventDto.Name;
-            eventDto.Owner = (UserSelectedDataDto)DataManager.Current.Users.Where(u => u.Id == updateEventDto.OwnerId);
             eventDto.Description = updateEventDto.Description;
             eventDto.Participants = updateEventDto.Participants;
             eventDto.Place = updateEventDto.Place;
@@ -91,10 +91,12 @@ namespace MotoGuild_API.Controllers
 
         private EventDto SaveEventToDataManager(CreateEventDto createEventDto, int id)
         {
+            var owner = DataManager.Current.Users.FirstOrDefault(u => u.Id == createEventDto.OwnerId);
             EventDto ewent = new EventDto()
             {
                 Id = id,
                 Name = createEventDto.Name,
+                Owner = new UserSelectedDataDto() { UserName = owner.UserName, Id = owner.Id, Email = owner.Email, Rating = owner.Rating },
                 Description = createEventDto.Description,
                 Participants = createEventDto.Participants,
                 Place = createEventDto.Place,

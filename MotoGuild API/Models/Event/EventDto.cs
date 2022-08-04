@@ -7,7 +7,7 @@ namespace MotoGuild_API.Models.Event
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public UserSelectedDataDto Owner { get; set; } = new UserSelectedDataDto();
+        public UserSelectedDataDto Owner { get; set; }
         public string Description { get; set; } = String.Empty;
         public ICollection<UserSelectedDataDto>? Participants { get; set; } = new List<UserSelectedDataDto>();
         public string Place { get; set; } = string.Empty;

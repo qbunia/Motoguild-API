@@ -87,8 +87,8 @@ namespace MotoGuild_API.Controllers
                 return NotFound();
             }
             var memberSelectedData = new UserSelectedDataDto()
-                { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
-            if (group.PendingMembers.FirstOrDefault(m=>m.Id==memberSelectedData.Id) == null)
+            { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            if (group.PendingMembers.FirstOrDefault(m => m.Id == memberSelectedData.Id) == null)
             {
                 ModelState.AddModelError(key: "Description", errorMessage: "User not found");
             }
@@ -100,7 +100,7 @@ namespace MotoGuild_API.Controllers
             member.Groups.Add(group);
             group.Members.Add(memberSelectedData);
             return NoContent();
-
+        }
 
         private bool UserExists(int id)
         {
