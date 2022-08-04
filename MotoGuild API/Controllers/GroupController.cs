@@ -30,7 +30,7 @@ namespace MotoGuild_API.Controllers
         [HttpPost]
         public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
         {
-            if (DataManager.Current.Users.FirstOrDefault(u=>u.Id == createGroupDto.OwnerId) == null)
+            if (!OwnerExists(createGroupDto))
             {
                 ModelState.AddModelError(key: "Description", errorMessage: "User not found");
             }
@@ -39,9 +39,15 @@ namespace MotoGuild_API.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             int newId = GetNewId();
             var group = SaveGroupToDataManager(createGroupDto, newId);
             return CreatedAtRoute("GetGroup", new { id = group.Id }, group);
+        }
+
+        private bool OwnerExists(CreateGroupDto createGroupDto)
+        {
+            return DataManager.Current.Users.FirstOrDefault(u => u.Id == createGroupDto.OwnerId) != null;
         }
 
         private GroupDto SaveGroupToDataManager(CreateGroupDto createGroupDto, int id)
