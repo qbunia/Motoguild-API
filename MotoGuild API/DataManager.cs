@@ -20,6 +20,14 @@ namespace MotoGuild_API
         private UserDto _firstUser = new UserDto()
             { Id = 1, UserName = "Xzibit", Email = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9 };
 
+        private UserSelectedDataDto owner = new UserSelectedDataDto()
+        {
+            Id = 2,
+            UserName = "Grzegorz",
+            Email = "grzegorz@gmail.com",
+            Rating = 4.0
+        };
+
         public DataManager()
         {
             Users = new List<UserDto>()
@@ -34,7 +42,21 @@ namespace MotoGuild_API
                     CreationDate = DateTime.Now, PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
                 }
             };
-            Events = new List<EventDto>();
+            Events = new List<EventDto>()
+            {
+                new EventDto() 
+                {
+                    Id = 1,
+                    Name = "Dni Limanowej",
+                    Owner = owner,
+                    Description = "Koncer jubileuszowy powstania miasta",
+                    Participants = new List<UserSelectedDataDto>(){ new UserSelectedDataDto {Id = 3, UserName = "Franek", Email = "franek@gmail.com", Rating = 3.0 } },
+                    Place = "LDK",
+                    Start = DateTime.Now,
+                    Stop = DateTime.Now,
+                    Posts = new List<PostDto>(){ new PostDto() { Author = owner, CreateTime = DateTime.Now, Content = "Napewno będzie świetna zabawz jak co roku :)"}}
+                }
+            };
             EventSelectedData = new List<EventSelectedDataDto>();
             Routes = new List<RouteDto>();
             Rides = new List<RideDto>();

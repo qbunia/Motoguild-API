@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Models.Event;
+using MotoGuild_API.Models.User;
 
 namespace MotoGuild_API.Controllers
 {
@@ -71,7 +72,9 @@ namespace MotoGuild_API.Controllers
 
         private void UpdateAllEventData(EventDto eventDto, UpdateEventDto updateEventDto)
         {
+
             eventDto.Name = updateEventDto.Name;
+            eventDto.Owner = (UserSelectedDataDto)DataManager.Current.Users.Where(u => u.Id == updateEventDto.OwnerId);
             eventDto.Description = updateEventDto.Description;
             eventDto.Participants = updateEventDto.Participants;
             eventDto.Place = updateEventDto.Place;

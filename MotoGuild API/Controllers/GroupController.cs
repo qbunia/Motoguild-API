@@ -46,10 +46,7 @@ namespace MotoGuild_API.Controllers
         }
 
         [HttpPut]
-        public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto)
-        {
 
-        }
 
         private bool OwnerExists(CreateGroupDto createGroupDto)
         {
