@@ -48,12 +48,9 @@ namespace MotoGuild_API.Controllers
         [HttpPut("{id:int}")]
         public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto, int id)
         {
-            if (!UserExists(addMemberDto.MemberId))
-            {
-                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
-            }
             var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
-            if (group == null)
+            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            if (group == null || member == null)
             {
                 return NotFound();
             }
@@ -66,14 +63,43 @@ namespace MotoGuild_API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            
             var memberSelectedData = new UserSelectedDataDto()
                 { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            if (group.IsPrivate)
+            {
+                group.PendingMembers.Add(memberSelectedData);
+                return NoContent();
+            }
             group.Members.Add(memberSelectedData);
             member.Groups.Add(group);
             return NoContent();
 
+        }
 
+        [HttpPut("accept/{id:int}")]
+        public IActionResult AcceptMember([FromBody] GroupAddMemberDto addMemberDto, int id)
+        {
+            var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
+            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            if (group == null || member == null)
+            {
+                return NotFound();
+            }
+            var memberSelectedData = new UserSelectedDataDto()
+                { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            if (group.PendingMembers.FirstOrDefault(m=>m.Id==memberSelectedData.Id) == null)
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            group.PendingMembers.Remove(memberSelectedData);
+            member.Groups.Add(group);
+            group.Members.Add(memberSelectedData);
+            return NoContent();
 
         }
 
