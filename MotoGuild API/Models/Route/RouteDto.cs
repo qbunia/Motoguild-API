@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public ICollection<Stops>? Stops { get; set; }
+        public ICollection<StopsDto>? Stops { get; set; }
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();

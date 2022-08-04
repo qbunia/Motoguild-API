@@ -1,6 +1,6 @@
 ﻿namespace MotoGuild_API.Models.Stops
 {
-    public class Stops
+    public class StopsDto
     {
         public int Id { get; set; }
         public string Name { get; set; }

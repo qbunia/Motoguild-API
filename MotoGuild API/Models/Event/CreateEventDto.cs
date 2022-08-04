@@ -1,24 +1,26 @@
 ﻿using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.User;
+using System.ComponentModel.DataAnnotations;
 
 namespace MotoGuild_API.Models.Event
 {
-    public class EventDto
+    public class CreateEventDto
     {
-        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
-        public UserSelectedDataDto Owner { get; set; }
+        [Required]
+        public static UserSelectedDataDto Owner { get; set; }
+        [Required]
         public string Description { get; set; } = String.Empty;
         public ICollection<UserSelectedDataDto>? Participants { get; set; } = new List<UserSelectedDataDto>();
+        [Required]
         public string Place { get; set; }
+        [Required]
+        [DataType(DataType.DateTime)]
         public DateTime Start { get; set; }
-        public DateTime Stop{ get; set; }
+        [Required]
+        [DataType(DataType.DateTime)]
+        public DateTime Stop { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
-    }
-    public class EventSelectedDataDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-
     }
 }
