@@ -28,7 +28,11 @@ namespace MotoGuild_API
             };
             Groups = new List<GroupDto>();
             Events = new List<EventDto>();
-            Routes = new List<RouteDto>();
+            Routes = new List<RouteDto>()
+            {
+                new RouteDto(){Id = 1, Name = "Szlakiem z pustym bakiem", Description = "Opis trasy", StartPlace = "Gdzieśtam", EndingPlace = "Gdzieśtam jeszcze dalej", Rating = 5}
+            };
+            
             Rides = new List<RideDto>();
         }
 
