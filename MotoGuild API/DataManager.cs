@@ -1,5 +1,6 @@
 ﻿using MotoGuild_API.Models.Event;
 using MotoGuild_API.Models.Group;
+using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.Ride;
 using MotoGuild_API.Models.Route;
 using MotoGuild_API.Models.User;
@@ -12,17 +13,30 @@ namespace MotoGuild_API
         public List<UserDto> Users { get; set; }
         public List<GroupDto> Groups { get; set; }
         public List<EventDto> Events { get; set; }
+        public List<EventSelectedDataDto> EventSelectedData { get; set; }
         public List<RideDto> Rides { get; set; }
         public List<RouteDto> Routes { get; set; }
+
+        private UserDto _firstUser = new UserDto()
+            { Id = 1, UserName = "Xzibit", Email = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9 };
 
         public DataManager()
         {
             Users = new List<UserDto>()
             {
-                new UserDto(){Id = 1, UserName = "Xzibit",Email  = "xzibit@gmail.com", PhoneNumber = 123456789, Rating = 4.9}
+               _firstUser
             };
-            Groups = new List<GroupDto>();
+            Groups = new List<GroupDto>()
+            {
+                new GroupDto()
+                {
+                    Id = 1, IsPrivate = true, Members = new List<UserSelectedDataDto>(), Name = "MC", Owner = GetFirstUserWithSelectedData(), 
+                    CreationDate = DateTime.Now, PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
+                }
+            };
             Events = new List<EventDto>();
+            EventSelectedData = new List<EventSelectedDataDto>();
+            Routes = new List<RouteDto>();
             Routes = new List<RouteDto>()
             {
                 new RouteDto(){Id = 1, Name = "Szlakiem z pustym bakiem", Description = "Opis trasy", StartPlace = "Gdzieśtam", EndingPlace = "Gdzieśtam jeszcze dalej", Rating = 5},
@@ -30,6 +44,12 @@ namespace MotoGuild_API
             };
             
             Rides = new List<RideDto>();
+        }
+
+        private UserSelectedDataDto GetFirstUserWithSelectedData()
+        {
+            return new UserSelectedDataDto()
+                { Email = _firstUser.Email, Rating = _firstUser.Rating, Id = _firstUser.Id, UserName = _firstUser.UserName };
         }
 
     }

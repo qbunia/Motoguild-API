@@ -24,5 +24,14 @@ namespace MotoGuild_API.Models.User
         public string UserName { get; set; }
         public string Email { get; set; }
         public double Rating { get; set; }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            var other = obj as UserSelectedDataDto;
+            return this.Id == other.Id;
+        }
     }
 }
