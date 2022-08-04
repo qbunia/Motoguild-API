@@ -30,7 +30,7 @@ namespace MotoGuild_API.Controllers
         [HttpPost]
         public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
         {
-            if (!OwnerExists(createGroupDto))
+            if (!UserExists(createGroupDto.OwnerId))
             {
                 ModelState.AddModelError(key: "Description", errorMessage: "User not found");
             }
@@ -45,12 +45,66 @@ namespace MotoGuild_API.Controllers
             return CreatedAtRoute("GetGroup", new { id = group.Id }, group);
         }
 
-        [HttpPut]
-
-
-        private bool OwnerExists(CreateGroupDto createGroupDto)
+        [HttpPut("{id:int}")]
+        public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto, int id)
         {
-            return DataManager.Current.Users.FirstOrDefault(u => u.Id == createGroupDto.OwnerId) != null;
+            var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
+            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            if (group == null || member == null)
+            {
+                return NotFound();
+            }
+            if (group.Members.Any(u => u.Id == addMemberDto.MemberId) || group.Owner.Id == addMemberDto.MemberId)
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User is already in group");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            
+            var memberSelectedData = new UserSelectedDataDto()
+                { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            if (group.IsPrivate)
+            {
+                group.PendingMembers.Add(memberSelectedData);
+                return NoContent();
+            }
+            group.Members.Add(memberSelectedData);
+            member.Groups.Add(group);
+            return NoContent();
+
+        }
+
+        [HttpPut("accept/{id:int}")]
+        public IActionResult AcceptMember([FromBody] GroupAddMemberDto addMemberDto, int id)
+        {
+            var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
+            var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
+            if (group == null || member == null)
+            {
+                return NotFound();
+            }
+            var memberSelectedData = new UserSelectedDataDto()
+                { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
+            if (group.PendingMembers.FirstOrDefault(m=>m.Id==memberSelectedData.Id) == null)
+            {
+                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            group.PendingMembers.Remove(memberSelectedData);
+            member.Groups.Add(group);
+            group.Members.Add(memberSelectedData);
+            return NoContent();
+
+
+        private bool UserExists(int id)
+        {
+            return DataManager.Current.Users.FirstOrDefault(u => u.Id == id) != null;
         }
 
         private GroupDto SaveGroupToDataManager(CreateGroupDto createGroupDto, int id)
