@@ -18,5 +18,6 @@ namespace MotoGuild_API.Models.Ride
         public int Estimation { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
         public int MinimumRating { get; set; }
+        
     }
 }
