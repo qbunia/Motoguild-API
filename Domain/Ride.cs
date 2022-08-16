@@ -10,9 +10,9 @@ namespace Domain
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        //public User User { get; set; }
+        public User Owner { get; set; }
         public string Description { get; set; }
-        public ICollection<User> Users { get; set; }
+        public ICollection<User> Participants { get; set; }
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public ICollection<Stop> Stops { get; set; }

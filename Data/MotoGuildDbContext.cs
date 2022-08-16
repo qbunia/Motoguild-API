@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain;
+﻿using Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data
@@ -24,10 +19,43 @@ namespace Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder);
+            
+            
+        
+            modelBuilder.Entity<User>()
+                .HasMany(a => a.OwnedEvents);
+            modelBuilder.Entity<User>()
+                .HasMany(a => a.OwnedGroups);
+            modelBuilder.Entity<User>()
+                .HasMany(a => a.OwnedRides);
 
-            //modelBuilder.ApplyConfiguration(new CountryConfiguration());
-            //modelBuilder.ApplyConfiguration(new HotelConfiguration());
+
+            modelBuilder.Entity<Group>()
+                .HasOne(a => a.Owner);
+            modelBuilder.Entity<Ride>()
+                .HasOne(a => a.Owner);
+            modelBuilder.Entity<Route>()
+                .HasOne(a => a.Owner);
+            modelBuilder.Entity<Event>()
+                .HasOne(a => a.Owner);
+
+
+            modelBuilder.Entity<Event>()
+                .HasMany(a => a.Participants)
+                .WithMany(b => b.Events);
+            modelBuilder.Entity<Ride>()
+                .HasMany(a => a.Participants)
+                .WithMany(b => b.Rides);
+            modelBuilder.Entity<Group>()
+                .HasMany(a => a.Participants)
+                .WithMany(b => b.Groups);
+            modelBuilder.Entity<Group>()
+                .HasMany(a => a.PendingUsers)
+                .WithMany(b => b.PendingGroups);
+
+
+
         }
-    }
+    
+}
 }

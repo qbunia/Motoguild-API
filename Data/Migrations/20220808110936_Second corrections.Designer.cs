@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(MotoGuildDbContext))]
-    partial class MotoGuildDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220808110936_Second corrections")]
+    partial class Secondcorrections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,14 +83,9 @@ namespace Data.Migrations
                     b.Property<DateTime>("Stop")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Events");
                 });
@@ -114,14 +111,9 @@ namespace Data.Migrations
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Groups");
                 });
@@ -207,14 +199,9 @@ namespace Data.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Rides");
                 });
@@ -323,32 +310,17 @@ namespace Data.Migrations
                     b.Property<int>("EventsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ParticipantsId")
+                    b.Property<int>("UsersId")
                         .HasColumnType("int");
 
-                    b.HasKey("EventsId", "ParticipantsId");
+                    b.HasKey("EventsId", "UsersId");
 
-                    b.HasIndex("ParticipantsId");
+                    b.HasIndex("UsersId");
 
                     b.ToTable("EventUser");
                 });
 
             modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.Property<int>("GroupsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GroupsId", "ParticipantsId");
-
-                    b.HasIndex("ParticipantsId");
-
-                    b.ToTable("GroupUser");
-                });
-
-            modelBuilder.Entity("GroupUser1", b =>
                 {
                     b.Property<int>("PendingGroupsId")
                         .HasColumnType("int");
@@ -359,6 +331,21 @@ namespace Data.Migrations
                     b.HasKey("PendingGroupsId", "PendingUsersId");
 
                     b.HasIndex("PendingUsersId");
+
+                    b.ToTable("GroupUser");
+                });
+
+            modelBuilder.Entity("GroupUser1", b =>
+                {
+                    b.Property<int>("GroupsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupsId", "ParticipantsId");
+
+                    b.HasIndex("ParticipantsId");
 
                     b.ToTable("GroupUser1");
                 });
@@ -396,14 +383,10 @@ namespace Data.Migrations
             modelBuilder.Entity("Domain.Event", b =>
                 {
                     b.HasOne("Domain.User", "Owner")
-                        .WithMany()
+                        .WithMany("OwnedEvents")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.User", null)
-                        .WithMany("OwnedEvents")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Owner");
                 });
@@ -411,14 +394,10 @@ namespace Data.Migrations
             modelBuilder.Entity("Domain.Group", b =>
                 {
                     b.HasOne("Domain.User", "Owner")
-                        .WithMany()
+                        .WithMany("OwnedGroups")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.User", null)
-                        .WithMany("OwnedGroups")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Owner");
                 });
@@ -453,14 +432,10 @@ namespace Data.Migrations
             modelBuilder.Entity("Domain.Ride", b =>
                 {
                     b.HasOne("Domain.User", "Owner")
-                        .WithMany()
+                        .WithMany("OwnedRides")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.User", null)
-                        .WithMany("OwnedRides")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Owner");
                 });
@@ -497,27 +472,12 @@ namespace Data.Migrations
 
                     b.HasOne("Domain.User", null)
                         .WithMany()
-                        .HasForeignKey("ParticipantsId")
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.HasOne("Domain.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.User", null)
-                        .WithMany()
-                        .HasForeignKey("ParticipantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("GroupUser1", b =>
                 {
                     b.HasOne("Domain.Group", null)
                         .WithMany()
@@ -528,6 +488,21 @@ namespace Data.Migrations
                     b.HasOne("Domain.User", null)
                         .WithMany()
                         .HasForeignKey("PendingUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GroupUser1", b =>
+                {
+                    b.HasOne("Domain.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
