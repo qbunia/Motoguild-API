@@ -8,7 +8,7 @@ using MotoGuild_API.Models.User;
 namespace MotoGuild_API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     public class UserController : ControllerBase
     {
         private MotoGuildDbContext _db;
@@ -22,7 +22,7 @@ namespace MotoGuild_API.Controllers
         public IActionResult GetUsers()
         {
             List<User> users = _db.Users.ToList();
-            var UsersDto = GetUsersDto(users);
+            var UsersDto = GetUsersDtos(users);
             return Ok(UsersDto);
         }
 
@@ -104,21 +104,21 @@ namespace MotoGuild_API.Controllers
         }
 
 
-        private List<UserSelectedDataDto> GetUsersDto(List<User> users)
+        private List<UserSelectedDataDto> GetUsersDtos(List<User> users)
         {
-            var usersSelectedData = new List<UserSelectedDataDto>();
+            var usersDtos = new List<UserSelectedDataDto>();
             foreach (var user in users)
             {
-                usersSelectedData.Add(new UserSelectedDataDto() { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName });
+                usersDtos.Add(new UserSelectedDataDto() { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName });
             }
-            return usersSelectedData;
+            return usersDtos;
         }
 
         private UserSelectedDataDto GetUserDto(User user)
         {
-            var userSelectedData = new UserSelectedDataDto()
+            var userDto = new UserSelectedDataDto()
                 { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName };
-            return userSelectedData;
+            return userDto;
         }
     }
 }
