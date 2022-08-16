@@ -1,4 +1,7 @@
 ﻿
+using Data;
+using Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Models.User;
 
@@ -8,22 +11,32 @@ namespace MotoGuild_API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
+        private MotoGuildDbContext _db;
+
+        public UserController(MotoGuildDbContext dbContext)
+        {
+            _db = dbContext;
+        }
+
         [HttpGet]
         public IActionResult GetUsers()
         {
-            var users = DataManager.Current.Users;
-            var usersSelectedData = SelectBasicInformationOfUsers(users);
-            return Ok(usersSelectedData);
+            List<User> users = _db.Users.ToList();
+            var UsersDto = GetUsersDto(users);
+            return Ok(UsersDto);
         }
 
         [HttpGet("{id:int}", Name = "GetUser")]
         public IActionResult GetUser(int id, [FromQuery] bool selectedData = false)
         {
-            if (selectedData)
+            var user = _db.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null)
             {
-                return GetUserWithSelectedData(id);
+                return NotFound();
             }
-            return GetUserData(id);
+
+            var UserDto = GetUserDto(user);
+            return Ok(UserDto);
         }
 
         [HttpPost]
@@ -33,20 +46,22 @@ namespace MotoGuild_API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            int newId = GetNewId();
-            var user = SaveUserToDataManager(createUserDto, newId);
-            return CreatedAtRoute("GetUser", new { id = user.Id }, user);
+            var user = SaveUserToDataBase(createUserDto);
+            var userDto = GetUserDto(user);
+            return CreatedAtRoute("GetUser", new { id = userDto.Id }, userDto);
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult DeleteUser(int id)
         {
-            var user = DataManager.Current.Users.FirstOrDefault(u => u.Id == id);
+            var user = _db.Users.FirstOrDefault(u => u.Id == id);
             if (user == null)
             {
                 return NotFound();
             }
-            DataManager.Current.Users.Remove(user);
+
+            _db.Remove(user);
+            _db.SaveChanges();
             return Ok();
         }
 
@@ -57,68 +72,39 @@ namespace MotoGuild_API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var userDto = DataManager.Current.Users.FirstOrDefault(i => i.Id == id);
-            if (userDto == null)
+            var user = _db.Users.FirstOrDefault(i => i.Id == id);
+            if (user == null)
             {
                 return NotFound();
             }
-            UpdateUserData(userDto, updateUserDto);
+            UpdateUserData(user, updateUserDto);
             return NoContent();
         }
 
-        private void UpdateUserData(UserDto userDto, UpdateUserDto updateUserDto)
+        private void UpdateUserData(User user, UpdateUserDto updateUserDto)
         {
-            userDto.UserName = updateUserDto.UserName;
-            userDto.Email = updateUserDto.Email;
-            userDto.PhoneNumber = updateUserDto.PhoneNumber;
+            user.UserName = updateUserDto.UserName;
+            user.Email = updateUserDto.Email;
+            user.PhoneNumber = updateUserDto.PhoneNumber;
+            _db.SaveChanges();
         }
 
-        private UserDto SaveUserToDataManager(CreateUserDto createUserDto, int id)
+        private User SaveUserToDataBase(CreateUserDto createUserDto)
         {
-            UserDto user = new UserDto()
+            User user = new User()
             {
-                Id = id,
                 UserName = createUserDto.UserName,
                 Email = createUserDto.Email,
                 PhoneNumber = createUserDto.PhoneNumber,
                 Rating = 0
             };
-            DataManager.Current.Users.Add(user);
+            _db.Users.Add(user);
+            _db.SaveChanges();
             return user;
         }
 
-        private IActionResult GetUserWithSelectedData(int id)
-        {
-            var user = DataManager.Current.Users.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            var userSelectedData = new UserSelectedDataDto()
-                { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName };
-            return Ok(userSelectedData);
-        }
 
-        private IActionResult GetUserData(int id)
-        {
-            var user = DataManager.Current.Users.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return Ok(user);
-        }
-
-        private int GetNewId()
-        {
-            if (DataManager.Current.Users.Count == 0)
-            {
-                return 1;
-            }
-            return DataManager.Current.Users.Max(u => u.Id) + 1;
-        }
-
-        private List<UserSelectedDataDto> SelectBasicInformationOfUsers(List<UserDto> users)
+        private List<UserSelectedDataDto> GetUsersDto(List<User> users)
         {
             var usersSelectedData = new List<UserSelectedDataDto>();
             foreach (var user in users)
@@ -126,6 +112,13 @@ namespace MotoGuild_API.Controllers
                 usersSelectedData.Add(new UserSelectedDataDto() { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName });
             }
             return usersSelectedData;
+        }
+
+        private UserSelectedDataDto GetUserDto(User user)
+        {
+            var userSelectedData = new UserSelectedDataDto()
+                { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName };
+            return userSelectedData;
         }
     }
 }

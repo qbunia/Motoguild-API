@@ -72,7 +72,7 @@ namespace MotoGuild_API.Controllers
                 return NoContent();
             }
             group.Members.Add(memberSelectedData);
-            member.Groups.Add(group);
+            //member.Groups.Add(group);
             return NoContent();
 
         }
@@ -97,7 +97,7 @@ namespace MotoGuild_API.Controllers
                 return BadRequest(ModelState);
             }
             group.PendingMembers.Remove(memberSelectedData);
-            member.Groups.Add(group);
+            //member.Groups.Add(group);
             group.Members.Add(memberSelectedData);
             return NoContent();
         }
@@ -122,7 +122,7 @@ namespace MotoGuild_API.Controllers
                 PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
             };
             DataManager.Current.Groups.Add(group);
-            owner.Groups.Add(group);
+            //owner.Groups.Add(group);
             return group;
         }
 
