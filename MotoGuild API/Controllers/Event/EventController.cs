@@ -35,7 +35,7 @@ namespace MotoGuild_API.Controllers
             int newId = GetNewId();
             var events = SaveEventToDataManager(createEventDto, newId);
             var owner = DataManager.Current.Users.FirstOrDefault(u=> u.Id == events.Owner.Id);
-            owner.Events.Add(events);
+            //owner.Events.Add(events);
             return CreatedAtRoute("GetEvent", new { id = events.Id }, events);
         }
 

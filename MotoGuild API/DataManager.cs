@@ -11,7 +11,7 @@ namespace MotoGuild_API
     {
         public static DataManager Current { get; } = new DataManager();
         public List<UserDto> Users { get; set; }
-        public List<GroupDto> Groups { get; set; }
+        public List<GroupParticipantsDto> Groups { get; set; }
         public List<EventDto> Events { get; set; }
         public List<EventSelectedDataDto> EventSelectedData { get; set; }
         public List<RideDto> Rides { get; set; }
@@ -34,13 +34,13 @@ namespace MotoGuild_API
             {
                _firstUser
             };
-            Groups = new List<GroupDto>()
+            Groups = new List<GroupParticipantsDto>()
             {
-                new GroupDto()
-                {
-                    Id = 1, IsPrivate = true, Members = new List<UserSelectedDataDto>(), Name = "MC", Owner = GetFirstUserWithSelectedData(), 
-                    CreationDate = DateTime.Now, PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
-                }
+                //new GroupDto()
+                //{
+                //    Id = 1, IsPrivate = true, Members = new List<UserSelectedDataDto>(), Name = "MC", Owner = GetFirstUserWithSelectedData(), 
+                //    CreationDate = DateTime.Now, PendingMembers = new List<UserSelectedDataDto>(), Posts = new List<PostDto>()
+                //}
             };
             Events = new List<EventDto>()
             {
