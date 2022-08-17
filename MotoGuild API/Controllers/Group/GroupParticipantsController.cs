@@ -29,7 +29,7 @@ namespace MotoGuild_API.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetParticipant")]
-        public IActionResult GetParticipant(int groupId, int id, [FromQuery] bool selectedData = false)
+        public IActionResult GetParticipant(int groupId, int id)
         {
             var group = _db.Groups
                 .Include(g => g.Participants)
@@ -49,141 +49,66 @@ namespace MotoGuild_API.Controllers
             var participantDto = GetParticipantDto(participant);
             return Ok(participantDto);
         }
-        //[HttpPost]
-        //public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
-        //{
-        //    if (!UserExists(createGroupDto.OwnerId))
-        //    {
-        //        ModelState.AddModelError(key: "Description", errorMessage: "User not found");
-        //    }
 
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        [HttpPost("{id:int}")]
+        public IActionResult AddParticipantByUserId(int groupId, int id)
+        {
+            
+            var group = _db.Groups
+                .Include(g => g.Participants)
+                .FirstOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
 
-        //    var group = SaveGroupToDataBase(createGroupDto);
-        //    var groupDto = GetGroupDto(group);
-        //    return CreatedAtRoute("GetGroup", new { id = groupDto.Id }, groupDto);
-        //}
+            var participant = _db.Users.FirstOrDefault(p => p.Id == id);
 
-        //[HttpDelete("{id:int}")]
-        //public IActionResult DeleteGroup(int id)
-        //{
-        //    var group = _db.Groups.FirstOrDefault(u => u.Id == id);
-        //    if (group == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (participant == null)
+            {
+                return NotFound();
+            }
 
-        //    _db.Remove(group);
-        //    _db.SaveChanges();
-        //    return Ok();
-        //}
+            AddParticipantToGroup(group, participant);
+            var participantDto = GetParticipantDto(participant);
+            return Ok(participantDto);
+        }
 
-        //[HttpPut("{id:int}")]
-        //public IActionResult UpdateGroup(int id, [FromBody] UpdateGroupDto updateGroupDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    var group = _db.Groups.FirstOrDefault(i => i.Id == id);
-        //    if (group == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    UpdateGroupData(group, updateGroupDto);
-        //    return NoContent();
-        //}
+        private void AddParticipantToGroup(Group group, User participant)
+        {
+            group.Participants.Add(participant);
+            _db.SaveChanges();
+        }
 
-        //private void UpdateGroupData(Group group, UpdateGroupDto updateGroupDto)
-        //{
-        //    group.Name = updateGroupDto.Name;
-        //    group.IsPrivate = updateGroupDto.IsPrivate;
-        //    _db.SaveChanges();
-        //}
+        [HttpDelete("{id:int}")]
+        public IActionResult DeleteParticipantByUserId(int groupId, int id)
+        {
 
-        //[HttpPut("{id:int}")]
-        //public IActionResult AddMember([FromBody] GroupAddMemberDto addMemberDto, int id)
-        //{
-        //    var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
-        //    var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
-        //    if (group == null || member == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    if (group.Members.Any(u => u.Id == addMemberDto.MemberId) || group.Owner.Id == addMemberDto.MemberId)
-        //    {
-        //        ModelState.AddModelError(key: "Description", errorMessage: "User is already in group");
-        //    }
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+            var group = _db.Groups
+                .Include(g => g.Participants)
+                .FirstOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
 
+            var participant = _db.Users.FirstOrDefault(p => p.Id == id);
 
-        //    var memberSelectedData = new UserSelectedDataDto()
-        //        { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
-        //    if (group.IsPrivate)
-        //    {
-        //        group.PendingMembers.Add(memberSelectedData);
-        //        return NoContent();
-        //    }
-        //    group.Members.Add(memberSelectedData);
-        //    //member.Groups.Add(group);
-        //    return NoContent();
+            if (participant == null)
+            {
+                return NotFound();
+            }
 
-        //}
+            DeleteParticipantFromGroup(group, participant);
+            var participantDto = GetParticipantDto(participant);
+            return Ok(participantDto);
+        }
 
-        //[HttpPut("accept/{id:int}")]
-        //public IActionResult AcceptMember([FromBody] GroupAddMemberDto addMemberDto, int id)
-        //{
-        //    var group = DataManager.Current.Groups.FirstOrDefault(g => g.Id == id);
-        //    var member = DataManager.Current.Users.FirstOrDefault(u => u.Id == addMemberDto.MemberId);
-        //    if (group == null || member == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var memberSelectedData = new UserSelectedDataDto()
-        //    { Email = member.Email, Id = member.Id, Rating = member.Rating, UserName = member.UserName };
-        //    if (group.PendingMembers.FirstOrDefault(m => m.Id == memberSelectedData.Id) == null)
-        //    {
-        //        ModelState.AddModelError(key: "Description", errorMessage: "User not found");
-        //    }
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    group.PendingMembers.Remove(memberSelectedData);
-        //    //member.Groups.Add(group);
-        //    group.Members.Add(memberSelectedData);
-        //    return NoContent();
-        //}
-
-        //private bool UserExists(int id)
-        //{
-        //    return _db.Users.FirstOrDefault(u => u.Id == id) != null;
-        //}
-
-        //private Group SaveGroupToDataBase(CreateGroupDto createGroupDto)
-        //{
-        //    var owner = _db.Users.FirstOrDefault(u => u.Id == createGroupDto.OwnerId);
-        //    var group = new Group()
-        //    {
-        //        Name = createGroupDto.Name,
-        //        CreationDate = DateTime.Now,
-        //        IsPrivate = createGroupDto.IsPrivate,
-        //        Owner = owner,
-        //        Participants = new List<User>()
-        //    };
-        //    group.Participants.Add(owner);
-        //    _db.Groups.Add(group);
-        //    _db.SaveChanges();
-        //    return group;
-        //}
-
-
+        private void DeleteParticipantFromGroup(Group group, User participant)
+        {
+            group.Participants.Remove(participant);
+            _db.SaveChanges();
+        }
 
         private List<UserSelectedDataDto> GetParticipantsDtos(List<User> participants)
         {
