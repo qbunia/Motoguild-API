@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Models.User;
 
@@ -6,6 +7,7 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowAnyOrigin")]
     public class UserController : ControllerBase
     {
         [HttpGet]
