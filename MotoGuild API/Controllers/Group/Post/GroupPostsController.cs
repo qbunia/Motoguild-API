@@ -38,7 +38,6 @@ namespace MotoGuild_API.Controllers
 
             var posts = _db.Posts
                 .Include(p => p.Author)
-                .Include(p => p.Comments)
                 .Where(p => postsId.Contains(p.Id)).ToList();
 
             if (posts == null)
@@ -59,8 +58,9 @@ namespace MotoGuild_API.Controllers
             {
                 return NotFound();
             }
-
-            var post = group.Posts.FirstOrDefault(p => p.Id == id);
+            var post = _db.Posts
+                .Include(p => p.Author)
+                .FirstOrDefault(p => p.Id == id);
 
             if (post == null)
             {
@@ -78,64 +78,52 @@ namespace MotoGuild_API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var post = SavePostToDataBase(createPostDto, groupId);
+            var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
+            var post = SavePostToDataBase(createPostDto, group);
             var postDto = GetPostDto(post);
-            return CreatedAtRoute("GetPost", new { id = postDto.Id }, postDto);
+            return CreatedAtRoute("GetPost", new { groupId = groupId, id = postDto.Id }, postDto);
         }
 
-        private Post SavePostToDataBase(CreatePostDto createUserDto, int groupId)
+        private Post SavePostToDataBase(CreatePostDto createUserDto, Group group)
         {
             var author = _db.Users.FirstOrDefault(u => u.Id == createUserDto.Author.Id);
-            var commentsId = createUserDto.Comments.Select(c => c.Id).ToList();
-            var comments = _db.Comments.Where(c => commentsId.Contains(c.Id)).ToList();
             Post post = new Post()
             {
                 Author = author,
-                Comments = comments,
+                Comments = new List<Comment>(),
                 Content = createUserDto.Content,
-                CreateTime = createUserDto.CreateTime,
+                CreateTime = DateTime.Now,
             };
-            var group = _db.Groups.FirstOrDefault(g => g.Id == groupId);
             group.Posts.Add(post);
             _db.SaveChanges();
             return post;
         }
 
-        private void AddParticipantToGroup(Group group, User participant)
-        {
-            group.Participants.Add(participant);
-            _db.SaveChanges();
-        }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteParticipantByUserId(int groupId, int id)
+        public IActionResult DeleteGroupPost(int groupId, int id)
         {
-
-            var group = _db.Groups
-                .Include(g => g.Participants)
-                .FirstOrDefault(g => g.Id == groupId);
+            var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(u => u.Id == groupId);
             if (group == null)
             {
                 return NotFound();
             }
 
-            var participant = _db.Users.FirstOrDefault(p => p.Id == id);
-
-            if (participant == null)
+            var post = _db.Posts.FirstOrDefault(p => p.Id == id);
+            if (!group.Posts.Contains(post))
             {
                 return NotFound();
             }
 
-            DeleteParticipantFromGroup(group, participant);
-            //var participantDto = GetParticipantDto(participant);
-            return Ok(participant);
+            _db.Posts.Remove(post);
+            _db.SaveChanges();
+            return Ok();
         }
 
-        private void DeleteParticipantFromGroup(Group group, User participant)
-        {
-            group.Participants.Remove(participant);
-            _db.SaveChanges();
-        }
 
         private List<PostDto> GetPostsDtos(List<Post> posts)
         {
@@ -150,31 +138,12 @@ namespace MotoGuild_API.Controllers
                     UserName = post.Author.UserName
                 };
 
-                var commentsDto = new List<CommentDto>();
-                foreach (var comment in post.Comments)
-                {
-                    var commentauthorDto = new UserSelectedDataDto()
-                    {
-                        Email = comment.Author.Email,
-                        Id = comment.Author.Id,
-                        Rating = comment.Author.Rating,
-                        UserName = comment.Author.UserName
-                    };
-                    commentsDto.Add(new CommentDto()
-                    {
-                        Author = commentauthorDto,
-                        Content = comment.Content,
-                        CreateTime = comment.CreateTime,
-                        Id = comment.Id
-                    });
-                }
                 postsDtos.Add(new PostDto()
                 {
                     Author = authorDto,
                     Content = post.Content,
                     CreateTime = post.CreateTime,
-                    Id = post.Id,
-                    Comments = commentsDto
+                    Id = post.Id
                 });
             }
             return postsDtos;
@@ -190,31 +159,12 @@ namespace MotoGuild_API.Controllers
                 UserName = post.Author.UserName
             };
 
-            var commentsDto = new List<CommentDto>();
-            foreach (var comment in post.Comments)
-            {
-                var commentauthorDto = new UserSelectedDataDto()
-                {
-                    Email = comment.Author.Email,
-                    Id = comment.Author.Id,
-                    Rating = comment.Author.Rating,
-                    UserName = comment.Author.UserName
-                };
-                commentsDto.Add(new CommentDto()
-                {
-                    Author = commentauthorDto,
-                    Content = comment.Content,
-                    CreateTime = comment.CreateTime,
-                    Id = comment.Id
-                });
-            }
             var postDto = new PostDto()
             {
                 Author = authorDto,
                 Content = post.Content,
                 CreateTime = post.CreateTime,
-                Id = post.Id,
-                Comments = commentsDto
+                Id = post.Id
             };
             return postDto;
         }

@@ -27,7 +27,7 @@ namespace MotoGuild_API.Controllers
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
                 .Include(g => g.PendingUsers)
-                .Include(g => g.Posts)
+                .Include(g => g.Posts).ThenInclude(p => p.Author)
                 .ToList();
             var groupsDto = GetGroupsDtos(groups);
             return Ok(groupsDto);
@@ -40,7 +40,7 @@ namespace MotoGuild_API.Controllers
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
                 .Include(g => g.PendingUsers)
-                .Include(g => g.Posts)
+                .Include(g => g.Posts).ThenInclude(p => p.Author)
                 .FirstOrDefault(g => g.Id == id);
             if (group == null)
             {
@@ -187,9 +187,9 @@ namespace MotoGuild_API.Controllers
 
         
 
-        private List<GroupDto> GetGroupsDtos(List<Group> groups)
+        private List<SelectedGroupDto> GetGroupsDtos(List<Group> groups)
         {
-            var groupsDtos = new List<GroupDto>();
+            var groupsDtos = new List<SelectedGroupDto>();
             foreach (var group in groups)
             {
                 var userDto = new UserSelectedDataDto()
@@ -221,13 +221,33 @@ namespace MotoGuild_API.Controllers
                         UserName = pendingUser.UserName
                     });
                 }
-                groupsDtos.Add(new GroupDto() 
+
+                var postsDto = new List<PostDto>();
+                foreach (var post in group.Posts)
+                {
+                    var authorDto = new UserSelectedDataDto()
+                    {
+                        Email = post.Author.Email,
+                        Id = post.Author.Id,
+                        Rating = post.Author.Rating,
+                        UserName = post.Author.UserName
+                    };
+                    postsDto.Add(new PostDto()
+                    {
+                        Id = post.Id,
+                        Author = authorDto,
+                        Content = post.Content,
+                        CreateTime = post.CreateTime
+                    });
+                }
+                groupsDtos.Add(new SelectedGroupDto() 
                     { 
                         Id = group.Id, 
                         IsPrivate = group.IsPrivate, 
                         Name = group.Name, Owner = userDto, 
                         Participants = participantsDto,
-                        PendingUsers = pendingUserDto
+                        PendingUsers = pendingUserDto,
+                        Posts = postsDto
 
                 });
             }
@@ -277,28 +297,10 @@ namespace MotoGuild_API.Controllers
                     Rating = post.Author.Rating,
                     UserName = post.Author.UserName
                 };
-                var commentsDto = new List<CommentDto>();
-                foreach (var comment in post.Comments)
-                {
-                    var commentauthorDto = new UserSelectedDataDto()
-                    {
-                        Email = comment.Author.Email,
-                        Id = comment.Author.Id,
-                        Rating = comment.Author.Rating,
-                        UserName = comment.Author.UserName
-                    };
-                    commentsDto.Add(new CommentDto()
-                    {
-                        Author = commentauthorDto,
-                        Content = comment.Content,
-                        CreateTime = comment.CreateTime,
-                        Id = comment.Id
-                    });
-                }
+                
                 postsDto.Add(new PostDto()
                 {
                     Author = authorDto,
-                    Comments = commentsDto,
                     Content = post.Content,
                     CreateTime = post.CreateTime
                 });
