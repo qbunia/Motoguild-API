@@ -2,6 +2,7 @@
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MotoGuild_API.Models.Comment;
 using MotoGuild_API.Models.Group;
 using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.User;
@@ -25,6 +26,8 @@ namespace MotoGuild_API.Controllers
             var groups = _db.Groups
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
+                .Include(g => g.PendingUsers)
+                .Include(g => g.Posts)
                 .ToList();
             var groupsDto = GetGroupsDtos(groups);
             return Ok(groupsDto);
@@ -36,6 +39,8 @@ namespace MotoGuild_API.Controllers
             var group = _db.Groups
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
+                .Include(g => g.PendingUsers)
+                .Include(g => g.Posts)
                 .FirstOrDefault(g => g.Id == id);
             if (group == null)
             {
@@ -182,9 +187,9 @@ namespace MotoGuild_API.Controllers
 
         
 
-        private List<GroupSelectedDataDto> GetGroupsDtos(List<Group> groups)
+        private List<GroupDto> GetGroupsDtos(List<Group> groups)
         {
-            var groupsDtos = new List<GroupSelectedDataDto>();
+            var groupsDtos = new List<GroupDto>();
             foreach (var group in groups)
             {
                 var userDto = new UserSelectedDataDto()
@@ -205,13 +210,31 @@ namespace MotoGuild_API.Controllers
                         UserName = participant.UserName
                     });
                 }
-                groupsDtos.Add(new GroupSelectedDataDto() 
-                    { Id = group.Id, IsPrivate = group.IsPrivate, Name = group.Name, Owner = userDto, Participants = participantsDto});
+                var pendingUserDto = new List<UserSelectedDataDto>();
+                foreach (var pendingUser in group.PendingUsers)
+                {
+                    pendingUserDto.Add(new UserSelectedDataDto()
+                    {
+                        Email = pendingUser.Email,
+                        Id = pendingUser.Id,
+                        Rating = pendingUser.Rating,
+                        UserName = pendingUser.UserName
+                    });
+                }
+                groupsDtos.Add(new GroupDto() 
+                    { 
+                        Id = group.Id, 
+                        IsPrivate = group.IsPrivate, 
+                        Name = group.Name, Owner = userDto, 
+                        Participants = participantsDto,
+                        PendingUsers = pendingUserDto
+
+                });
             }
             return groupsDtos;
         }
 
-        private GroupSelectedDataDto GetGroupDto(Group group)
+        private GroupDto GetGroupDto(Group group)
         {
             var userDto = new UserSelectedDataDto()
             {
@@ -231,9 +254,66 @@ namespace MotoGuild_API.Controllers
                     UserName = participant.UserName
                 });
             }
-            var groupDto = new GroupSelectedDataDto()
+
+            var pendingUserDto = new List<UserSelectedDataDto>();
+            foreach (var pendingUser in group.PendingUsers)
             {
-                Id = group.Id, IsPrivate = group.IsPrivate, Name = group.Name, Owner = userDto, CreationDate = group.CreationDate, Participants = participantsDto
+                pendingUserDto.Add(new UserSelectedDataDto()
+                {
+                    Email = pendingUser.Email,
+                    Id = pendingUser.Id,
+                    Rating = pendingUser.Rating,
+                    UserName = pendingUser.UserName
+                });
+            }
+
+            var postsDto = new List<PostDto>();
+            foreach (var post in group.Posts)
+            {
+                var authorDto = new UserSelectedDataDto()
+                {
+                    Email = post.Author.Email,
+                    Id = post.Author.Id,
+                    Rating = post.Author.Rating,
+                    UserName = post.Author.UserName
+                };
+                var commentsDto = new List<CommentDto>();
+                foreach (var comment in post.Comments)
+                {
+                    var commentauthorDto = new UserSelectedDataDto()
+                    {
+                        Email = comment.Author.Email,
+                        Id = comment.Author.Id,
+                        Rating = comment.Author.Rating,
+                        UserName = comment.Author.UserName
+                    };
+                    commentsDto.Add(new CommentDto()
+                    {
+                        Author = commentauthorDto,
+                        Content = comment.Content,
+                        CreateTime = comment.CreateTime,
+                        Id = comment.Id
+                    });
+                }
+                postsDto.Add(new PostDto()
+                {
+                    Author = authorDto,
+                    Comments = commentsDto,
+                    Content = post.Content,
+                    CreateTime = post.CreateTime
+                });
+            }
+
+            var groupDto = new GroupDto()
+            {
+                Id = group.Id, 
+                IsPrivate = group.IsPrivate, 
+                Name = group.Name, 
+                Owner = userDto, 
+                CreationDate = group.CreationDate, 
+                Participants = participantsDto,
+                PendingUsers = pendingUserDto,
+                Posts = postsDto
             };
             return groupDto;
         }

@@ -23,7 +23,21 @@ namespace MotoGuild_API.Controllers
         [HttpGet]
         public IActionResult GetParticipants(int groupId)
         {
-            var participants = _db.Groups.Include(g => g.Participants).Where(g => g.Id == groupId).Select(g => g.Participants).First().ToList();
+
+            var group = _db.Groups
+                .Include(g => g.Participants)
+                .FirstOrDefault(g => g.Id == groupId);
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            var participants = group.Participants.ToList();
+
+            if (participants == null)
+            {
+                return NotFound();
+            }
             var participantsDto = GetParticipantsDtos(participants);
             return Ok(participantsDto);
         }
