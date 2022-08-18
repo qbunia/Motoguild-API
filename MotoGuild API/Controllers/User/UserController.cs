@@ -106,19 +106,19 @@ namespace MotoGuild_API.Controllers
         }
 
 
-        private List<UserSelectedDataDto> GetUsersDtos(List<User> users)
+        private List<UserDto> GetUsersDtos(List<User> users)
         {
-            var usersDtos = new List<UserSelectedDataDto>();
+            var usersDtos = new List<UserDto>();
             foreach (var user in users)
             {
-                usersDtos.Add(new UserSelectedDataDto() { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName });
+                usersDtos.Add(new UserDto() { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName });
             }
             return usersDtos;
         }
 
-        private UserSelectedDataDto GetUserDto(User user)
+        private UserDto GetUserDto(User user)
         {
-            var userDto = new UserSelectedDataDto()
+            var userDto = new UserDto()
                 { Email = user.Email, Rating = user.Rating, Id = user.Id, UserName = user.UserName };
             return userDto;
         }

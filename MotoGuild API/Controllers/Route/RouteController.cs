@@ -110,7 +110,7 @@ namespace MotoGuild_API.Controllers.Route
             foreach (var route in routes)
             {
                 var owner = _db.Users.FirstOrDefault(u => u.Id == route.Owner.Id);
-                var ownerDto = new UserSelectedDataDto()
+                var ownerDto = new UserDto()
                 {
                     Email = owner.Email,
                     Id = owner.Id,
@@ -135,7 +135,7 @@ namespace MotoGuild_API.Controllers.Route
         private RouteDto GetRouteDto(Domain.Route route)
         {
             var owner = _db.Users.FirstOrDefault(u => u.Id == route.Owner.Id);
-            var ownerDto = new UserSelectedDataDto()
+            var ownerDto = new UserDto()
             {
                 Email = owner.Email,
                 Id = owner.Id,

@@ -61,7 +61,7 @@ namespace MotoGuild_API.Controllers
             var postsDtos = new List<PostDto>();
             foreach (var post in feed.Posts)
             {
-                var authorDto = new UserSelectedDataDto()
+                var authorDto = new UserDto()
                 {
                     Email = post.Author.Email,
                     Id = post.Author.Id,

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Group;
@@ -10,6 +11,7 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups")]
+[EnableCors("AllowAnyOrigin")]
 public class GroupController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
@@ -55,7 +57,12 @@ public class GroupController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var group = SaveGroupToDataBase(createGroupDto);
-        var groupDto = GetGroupDto(group);
+        var groupFull = _db.Groups
+            .Include(g => g.PendingUsers)
+            .Include(g => g.Posts)
+            .Include(g => g.Participants)
+            .FirstOrDefault(g => g.Id == group.Id);
+        var groupDto = GetGroupDto(groupFull);
         return CreatedAtRoute("GetGroup", new {id = groupDto.Id}, groupDto);
     }
 
@@ -116,50 +123,24 @@ public class GroupController : ControllerBase
         var groupsDtos = new List<SelectedGroupDto>();
         foreach (var group in groups)
         {
-            var userDto = new UserSelectedDataDto
+            var userDto = new UserDto
             {
                 Email = group.Owner.Email,
                 Id = group.Owner.Id,
                 Rating = group.Owner.Rating,
                 UserName = group.Owner.UserName
             };
-            var participantsDto = new List<UserSelectedDataDto>();
+            var participantsDto = new List<UserDto>();
             foreach (var participant in group.Participants)
-                participantsDto.Add(new UserSelectedDataDto
+                participantsDto.Add(new UserDto
                 {
                     Email = participant.Email,
                     Id = participant.Id,
                     Rating = participant.Rating,
                     UserName = participant.UserName
                 });
-            var pendingUserDto = new List<UserSelectedDataDto>();
-            foreach (var pendingUser in group.PendingUsers)
-                pendingUserDto.Add(new UserSelectedDataDto
-                {
-                    Email = pendingUser.Email,
-                    Id = pendingUser.Id,
-                    Rating = pendingUser.Rating,
-                    UserName = pendingUser.UserName
-                });
 
-            var postsDto = new List<PostDto>();
-            foreach (var post in group.Posts)
-            {
-                var authorDto = new UserSelectedDataDto
-                {
-                    Email = post.Author.Email,
-                    Id = post.Author.Id,
-                    Rating = post.Author.Rating,
-                    UserName = post.Author.UserName
-                };
-                postsDto.Add(new PostDto
-                {
-                    Id = post.Id,
-                    Author = authorDto,
-                    Content = post.Content,
-                    CreateTime = post.CreateTime
-                });
-            }
+            var rating = group.Participants.Select(p => p.Rating).Average();
 
             groupsDtos.Add(new SelectedGroupDto
             {
@@ -167,8 +148,7 @@ public class GroupController : ControllerBase
                 IsPrivate = group.IsPrivate,
                 Name = group.Name, Owner = userDto,
                 Participants = participantsDto,
-                PendingUsers = pendingUserDto,
-                Posts = postsDto
+                Rating = rating
             });
         }
 
@@ -177,16 +157,16 @@ public class GroupController : ControllerBase
 
     private GroupDto GetGroupDto(Group group)
     {
-        var userDto = new UserSelectedDataDto
+        var userDto = new UserDto
         {
             Email = group.Owner.Email,
             Id = group.Owner.Id,
             Rating = group.Owner.Rating,
             UserName = group.Owner.UserName
         };
-        var participantsDto = new List<UserSelectedDataDto>();
+        var participantsDto = new List<UserDto>();
         foreach (var participant in group.Participants)
-            participantsDto.Add(new UserSelectedDataDto
+            participantsDto.Add(new UserDto
             {
                 Email = participant.Email,
                 Id = participant.Id,
@@ -194,9 +174,9 @@ public class GroupController : ControllerBase
                 UserName = participant.UserName
             });
 
-        var pendingUserDto = new List<UserSelectedDataDto>();
+        var pendingUserDto = new List<UserDto>();
         foreach (var pendingUser in group.PendingUsers)
-            pendingUserDto.Add(new UserSelectedDataDto
+            pendingUserDto.Add(new UserDto
             {
                 Email = pendingUser.Email,
                 Id = pendingUser.Id,
@@ -207,7 +187,7 @@ public class GroupController : ControllerBase
         var postsDto = new List<PostDto>();
         foreach (var post in group.Posts)
         {
-            var authorDto = new UserSelectedDataDto
+            var authorDto = new UserDto
             {
                 Email = post.Author.Email,
                 Id = post.Author.Id,

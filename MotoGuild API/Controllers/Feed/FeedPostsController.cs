@@ -24,7 +24,7 @@ namespace MotoGuild_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetFeedPosts(int feedId)
+        public IActionResult GetFeedPosts(int feedId, [FromQuery] bool orderByDate = false)
         {
 
             var feed = _db.Feed
@@ -37,9 +37,21 @@ namespace MotoGuild_API.Controllers
 
             var postsId = feed.Posts.Select(p => p.Id);
 
-            var posts = _db.Posts
-                .Include(p => p.Author)
-                .Where(p => postsId.Contains(p.Id)).ToList();
+            var posts = new List<Post>();
+
+            if (orderByDate)
+            {
+                posts = _db.Posts
+                    .Include(p => p.Author)
+                    .Where(p => postsId.Contains(p.Id)).OrderByDescending(p => p.CreateTime).ToList();
+            }
+            else
+            {
+                posts = _db.Posts
+                    .Include(p => p.Author)
+                    .Where(p => postsId.Contains(p.Id)).ToList();
+            }
+            
 
             if (posts == null)
             {
@@ -131,7 +143,7 @@ namespace MotoGuild_API.Controllers
             var postsDtos = new List<PostDto>();
             foreach (var post in posts)
             {
-                var authorDto = new UserSelectedDataDto()
+                var authorDto = new UserDto()
                 {
                     Email = post.Author.Email,
                     Id = post.Author.Id,
@@ -152,7 +164,7 @@ namespace MotoGuild_API.Controllers
 
         private PostDto GetFeedPostDto(Post post)
         {
-            var authorDto = new UserSelectedDataDto()
+            var authorDto = new UserDto()
             {
                 Email = post.Author.Email,
                 Id = post.Author.Id,

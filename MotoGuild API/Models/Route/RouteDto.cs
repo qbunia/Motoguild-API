@@ -12,7 +12,7 @@ namespace MotoGuild_API.Models.Route
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public int Rating { get; set; }
-        public UserSelectedDataDto Owner { get; set; }
+        public UserDto Owner { get; set; }
     }
 
     public class UserRouteDto

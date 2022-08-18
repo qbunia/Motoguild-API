@@ -23,7 +23,7 @@ namespace MotoGuild_API.Models.Ride
         public DateTime StartTime { get; set; }
         
         public UserRideDto Owner { get; set; }
-        public ICollection<UserSelectedDataDto> Participants { get; set; } = new List<UserSelectedDataDto>();
+        public ICollection<UserDto> Participants { get; set; } = new List<UserDto>();
         public ICollection<PostDto>? Posts { get; set; } = new List<PostDto>();
 
         public ICollection<StopDto>? Stops { get; set; } = new List<StopDto>();

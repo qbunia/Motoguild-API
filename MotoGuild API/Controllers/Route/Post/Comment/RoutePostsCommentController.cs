@@ -8,74 +8,74 @@ using MotoGuild_API.Models.User;
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
-[Route("api/groups/{groupId:int}/posts/{postId:int}/comments")]
-public class GroupPostsCommentController : ControllerBase
+[Route("api/routes/{routeId:int}/posts/{postId:int}/comments")]
+public class RoutePostsCommentController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
 
-    public GroupPostsCommentController(MotoGuildDbContext dbContext)
+    public RoutePostsCommentController(MotoGuildDbContext dbContext)
     {
         _db = dbContext;
     }
 
     [HttpGet]
-    public IActionResult GetGroupPostComments(int groupId, int postId)
+    public IActionResult GetRoutePostComments(int routeId, int postId)
     {
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !route.Posts.Contains(post)) return NotFound();
 
         var commentsId = post.Comments.Select(c => c.Id);
 
         var comments = _db.Comments.Where(c => commentsId.Contains(c.Id)).ToList();
 
-        var commentsDto = GetGroupPostCommentsDtos(comments);
+        var commentsDto = GetRoutePostCommentsDtos(comments);
         return Ok(commentsDto);
     }
 
-    [HttpGet("{id:int}", Name = "GetGroupPostComment")]
-    public IActionResult GetGroupPostComment(int groupId, int postId, int id)
+    [HttpGet("{id:int}", Name = "GetRoutePostComment")]
+    public IActionResult GetRoutePostComment(int routeId, int postId, int id)
     {
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !route.Posts.Contains(post)) return NotFound();
 
         var comment = _db.Comments.FirstOrDefault(c => c.Id == id);
 
         if (comment == null) return NotFound();
 
-        var commentDto = GetGroupPostCommentDto(comment);
+        var commentDto = GetRoutePostCommentDto(comment);
         return Ok(commentDto);
     }
 
     [HttpPost]
-    public IActionResult CreateGroupPostComment(int groupId, int postId, [FromBody] CreateCommentDto createCommentDto)
+    public IActionResult CreateRoutePostComment(int routeId, int postId, [FromBody] CreateCommentDto createCommentDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
-        var comment = SaveGroupPostCommentToDataBase(createCommentDto, post);
-        var commentDto = GetGroupPostCommentDto(comment);
-        return CreatedAtRoute("GetGroupPostComment", new {groupId, postId, id = commentDto.Id}, commentDto);
+        if (post == null || !route.Posts.Contains(post)) return NotFound();
+        var comment = SaveRoutePostCommentToDataBase(createCommentDto, post);
+        var commentDto = GetRoutePostCommentDto(comment);
+        return CreatedAtRoute("GetRoutePostComment", new { routeId, postId, id = commentDto.Id }, commentDto);
     }
 
-    private Comment SaveGroupPostCommentToDataBase(CreateCommentDto createCommentDto, Post post)
+    private Comment SaveRoutePostCommentToDataBase(CreateCommentDto createCommentDto, Post post)
     {
         var author = _db.Users.FirstOrDefault(u => u.Id == createCommentDto.Author.Id);
         var comment = new Comment
@@ -91,16 +91,16 @@ public class GroupPostsCommentController : ControllerBase
 
 
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteGroupPostComment(int groupId, int postId, int id)
+    public IActionResult DeleteGroupPostComment(int routeId, int postId, int id)
     {
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !route.Posts.Contains(post)) return NotFound();
 
         var comment = _db.Comments.FirstOrDefault(c => c.Id == id);
 
@@ -112,7 +112,7 @@ public class GroupPostsCommentController : ControllerBase
     }
 
 
-    private List<CommentDto> GetGroupPostCommentsDtos(List<Comment> comments)
+    private List<CommentDto> GetRoutePostCommentsDtos(List<Comment> comments)
     {
         var commentsDtos = new List<CommentDto>();
         foreach (var comment in comments)
@@ -137,7 +137,7 @@ public class GroupPostsCommentController : ControllerBase
         return commentsDtos;
     }
 
-    private CommentDto GetGroupPostCommentDto(Comment comment)
+    private CommentDto GetRoutePostCommentDto(Comment comment)
     {
         var authorDto = new UserDto
         {

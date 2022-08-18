@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Comment;
@@ -8,74 +9,75 @@ using MotoGuild_API.Models.User;
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
-[Route("api/groups/{groupId:int}/posts/{postId:int}/comments")]
-public class GroupPostsCommentController : ControllerBase
+[Route("api/feeds/{feedId:int}/posts/{postId:int}/comments")]
+[EnableCors("AllowAnyOrigin")]
+public class FeedPostsCommentController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
 
-    public GroupPostsCommentController(MotoGuildDbContext dbContext)
+    public FeedPostsCommentController(MotoGuildDbContext dbContext)
     {
         _db = dbContext;
     }
 
     [HttpGet]
-    public IActionResult GetGroupPostComments(int groupId, int postId)
+    public IActionResult GetFeedPostComments(int feedId, int postId)
     {
-        var group = _db.Groups
+        var feed = _db.Feed
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == feedId);
+        if (feed == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !feed.Posts.Contains(post)) return NotFound();
 
         var commentsId = post.Comments.Select(c => c.Id);
 
         var comments = _db.Comments.Where(c => commentsId.Contains(c.Id)).ToList();
 
-        var commentsDto = GetGroupPostCommentsDtos(comments);
+        var commentsDto = GetFeedPostCommentsDtos(comments);
         return Ok(commentsDto);
     }
 
-    [HttpGet("{id:int}", Name = "GetGroupPostComment")]
-    public IActionResult GetGroupPostComment(int groupId, int postId, int id)
+    [HttpGet("{id:int}", Name = "GetFeedPostComment")]
+    public IActionResult GetFeedPostComment(int feedId, int postId, int id)
     {
-        var group = _db.Groups
+        var feed = _db.Feed
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == feedId);
+        if (feed == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !feed.Posts.Contains(post)) return NotFound();
 
         var comment = _db.Comments.FirstOrDefault(c => c.Id == id);
 
         if (comment == null) return NotFound();
 
-        var commentDto = GetGroupPostCommentDto(comment);
+        var commentDto = GetFeedPostCommentDto(comment);
         return Ok(commentDto);
     }
 
     [HttpPost]
-    public IActionResult CreateGroupPostComment(int groupId, int postId, [FromBody] CreateCommentDto createCommentDto)
+    public IActionResult CreateFeedPostComment(int feedId, int postId, [FromBody] CreateCommentDto createCommentDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var group = _db.Groups
+        var feed = _db.Feed
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == feedId);
+        if (feed == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
-        var comment = SaveGroupPostCommentToDataBase(createCommentDto, post);
-        var commentDto = GetGroupPostCommentDto(comment);
-        return CreatedAtRoute("GetGroupPostComment", new {groupId, postId, id = commentDto.Id}, commentDto);
+        if (post == null || !feed.Posts.Contains(post)) return NotFound();
+        var comment = SaveFeedPostCommentToDataBase(createCommentDto, post);
+        var commentDto = GetFeedPostCommentDto(comment);
+        return CreatedAtRoute("GetFeedPostComment", new { feedId, postId, id = commentDto.Id }, commentDto);
     }
 
-    private Comment SaveGroupPostCommentToDataBase(CreateCommentDto createCommentDto, Post post)
+    private Comment SaveFeedPostCommentToDataBase(CreateCommentDto createCommentDto, Post post)
     {
         var author = _db.Users.FirstOrDefault(u => u.Id == createCommentDto.Author.Id);
         var comment = new Comment
@@ -91,16 +93,16 @@ public class GroupPostsCommentController : ControllerBase
 
 
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteGroupPostComment(int groupId, int postId, int id)
+    public IActionResult DeleteFeedPostComment(int feedId, int postId, int id)
     {
-        var group = _db.Groups
+        var route = _db.Feed
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == feedId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.Include(p => p.Comments).ThenInclude(c => c.Author).FirstOrDefault(p => p.Id == postId);
 
-        if (post == null || !group.Posts.Contains(post)) return NotFound();
+        if (post == null || !route.Posts.Contains(post)) return NotFound();
 
         var comment = _db.Comments.FirstOrDefault(c => c.Id == id);
 
@@ -112,7 +114,7 @@ public class GroupPostsCommentController : ControllerBase
     }
 
 
-    private List<CommentDto> GetGroupPostCommentsDtos(List<Comment> comments)
+    private List<CommentDto> GetFeedPostCommentsDtos(List<Comment> comments)
     {
         var commentsDtos = new List<CommentDto>();
         foreach (var comment in comments)
@@ -137,7 +139,7 @@ public class GroupPostsCommentController : ControllerBase
         return commentsDtos;
     }
 
-    private CommentDto GetGroupPostCommentDto(Comment comment)
+    private CommentDto GetFeedPostCommentDto(Comment comment)
     {
         var authorDto = new UserDto
         {
