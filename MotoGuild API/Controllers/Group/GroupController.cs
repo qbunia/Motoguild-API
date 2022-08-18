@@ -137,34 +137,8 @@ public class GroupController : ControllerBase
                     Rating = participant.Rating,
                     UserName = participant.UserName
                 });
-            var pendingUserDto = new List<UserSelectedDataDto>();
-            foreach (var pendingUser in group.PendingUsers)
-                pendingUserDto.Add(new UserSelectedDataDto
-                {
-                    Email = pendingUser.Email,
-                    Id = pendingUser.Id,
-                    Rating = pendingUser.Rating,
-                    UserName = pendingUser.UserName
-                });
 
-            var postsDto = new List<PostDto>();
-            foreach (var post in group.Posts)
-            {
-                var authorDto = new UserSelectedDataDto
-                {
-                    Email = post.Author.Email,
-                    Id = post.Author.Id,
-                    Rating = post.Author.Rating,
-                    UserName = post.Author.UserName
-                };
-                postsDto.Add(new PostDto
-                {
-                    Id = post.Id,
-                    Author = authorDto,
-                    Content = post.Content,
-                    CreateTime = post.CreateTime
-                });
-            }
+            var rating = group.Participants.Select(p => p.Rating).Average();
 
             groupsDtos.Add(new SelectedGroupDto
             {
@@ -172,8 +146,7 @@ public class GroupController : ControllerBase
                 IsPrivate = group.IsPrivate,
                 Name = group.Name, Owner = userDto,
                 Participants = participantsDto,
-                PendingUsers = pendingUserDto,
-                Posts = postsDto
+                Rating = rating
             });
         }
 

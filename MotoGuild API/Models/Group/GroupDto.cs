@@ -40,7 +40,6 @@ namespace MotoGuild_API.Models.Group
         public DateTime CreationDate { get; set; }
 
         public List<UserSelectedDataDto> Participants { get; set; }
-        public List<UserSelectedDataDto> PendingUsers { get; set; }
-        public List<PostDto> Posts { get; set; }
+        public double Rating { get; set; }
     }
 }
