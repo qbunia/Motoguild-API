@@ -94,11 +94,11 @@ public class GroupParticipantsController : ControllerBase
         _db.SaveChanges();
     }
 
-    private List<UserSelectedDataDto> GetGroupParticipantsDtos(List<User> participants)
+    private List<UserDto> GetGroupParticipantsDtos(List<User> participants)
     {
-        var participantsDtos = new List<UserSelectedDataDto>();
+        var participantsDtos = new List<UserDto>();
         foreach (var participant in participants)
-            participantsDtos.Add(new UserSelectedDataDto
+            participantsDtos.Add(new UserDto
             {
                 Email = participant.Email, Rating = participant.Rating, Id = participant.Id,
                 UserName = participant.UserName
@@ -106,9 +106,9 @@ public class GroupParticipantsController : ControllerBase
         return participantsDtos;
     }
 
-    private UserSelectedDataDto GetGroupParticipantDto(User participant)
+    private UserDto GetGroupParticipantDto(User participant)
     {
-        var participantDto = new UserSelectedDataDto
+        var participantDto = new UserDto
         {
             Email = participant.Email,
             Id = participant.Id,

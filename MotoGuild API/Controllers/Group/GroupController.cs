@@ -123,16 +123,16 @@ public class GroupController : ControllerBase
         var groupsDtos = new List<SelectedGroupDto>();
         foreach (var group in groups)
         {
-            var userDto = new UserSelectedDataDto
+            var userDto = new UserDto
             {
                 Email = group.Owner.Email,
                 Id = group.Owner.Id,
                 Rating = group.Owner.Rating,
                 UserName = group.Owner.UserName
             };
-            var participantsDto = new List<UserSelectedDataDto>();
+            var participantsDto = new List<UserDto>();
             foreach (var participant in group.Participants)
-                participantsDto.Add(new UserSelectedDataDto
+                participantsDto.Add(new UserDto
                 {
                     Email = participant.Email,
                     Id = participant.Id,
@@ -157,16 +157,16 @@ public class GroupController : ControllerBase
 
     private GroupDto GetGroupDto(Group group)
     {
-        var userDto = new UserSelectedDataDto
+        var userDto = new UserDto
         {
             Email = group.Owner.Email,
             Id = group.Owner.Id,
             Rating = group.Owner.Rating,
             UserName = group.Owner.UserName
         };
-        var participantsDto = new List<UserSelectedDataDto>();
+        var participantsDto = new List<UserDto>();
         foreach (var participant in group.Participants)
-            participantsDto.Add(new UserSelectedDataDto
+            participantsDto.Add(new UserDto
             {
                 Email = participant.Email,
                 Id = participant.Id,
@@ -174,9 +174,9 @@ public class GroupController : ControllerBase
                 UserName = participant.UserName
             });
 
-        var pendingUserDto = new List<UserSelectedDataDto>();
+        var pendingUserDto = new List<UserDto>();
         foreach (var pendingUser in group.PendingUsers)
-            pendingUserDto.Add(new UserSelectedDataDto
+            pendingUserDto.Add(new UserDto
             {
                 Email = pendingUser.Email,
                 Id = pendingUser.Id,
@@ -187,7 +187,7 @@ public class GroupController : ControllerBase
         var postsDto = new List<PostDto>();
         foreach (var post in group.Posts)
         {
-            var authorDto = new UserSelectedDataDto
+            var authorDto = new UserDto
             {
                 Email = post.Author.Email,
                 Id = post.Author.Id,

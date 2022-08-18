@@ -94,11 +94,11 @@ public class GroupPendingUsersController : ControllerBase
         _db.SaveChanges();
     }
 
-    private List<UserSelectedDataDto> GetGroupPendingUsersDtos(List<User> pendingUsers)
+    private List<UserDto> GetGroupPendingUsersDtos(List<User> pendingUsers)
     {
-        var pendingUsersDtos = new List<UserSelectedDataDto>();
+        var pendingUsersDtos = new List<UserDto>();
         foreach (var pendingUser in pendingUsers)
-            pendingUsersDtos.Add(new UserSelectedDataDto
+            pendingUsersDtos.Add(new UserDto
             {
                 Email = pendingUser.Email, Rating = pendingUser.Rating, Id = pendingUser.Id,
                 UserName = pendingUser.UserName
@@ -106,9 +106,9 @@ public class GroupPendingUsersController : ControllerBase
         return pendingUsersDtos;
     }
 
-    private UserSelectedDataDto GetGroupPendingUserDto(User pendingUser)
+    private UserDto GetGroupPendingUserDto(User pendingUser)
     {
-        var pendingUserDto = new UserSelectedDataDto
+        var pendingUserDto = new UserDto
         {
             Email = pendingUser.Email,
             Id = pendingUser.Id,

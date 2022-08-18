@@ -117,7 +117,7 @@ public class FeedPostsCommentController : ControllerBase
         var commentsDtos = new List<CommentDto>();
         foreach (var comment in comments)
         {
-            var authorDto = new UserSelectedDataDto
+            var authorDto = new UserDto
             {
                 Email = comment.Author.Email,
                 Id = comment.Author.Id,
@@ -139,7 +139,7 @@ public class FeedPostsCommentController : ControllerBase
 
     private CommentDto GetFeedPostCommentDto(Comment comment)
     {
-        var authorDto = new UserSelectedDataDto
+        var authorDto = new UserDto
         {
             Email = comment.Author.Email,
             Id = comment.Author.Id,

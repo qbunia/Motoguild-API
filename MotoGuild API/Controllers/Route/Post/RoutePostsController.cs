@@ -101,7 +101,7 @@ public class RoutePostsController : ControllerBase
         var postsDtos = new List<PostDto>();
         foreach (var post in posts)
         {
-            var authorDto = new UserSelectedDataDto
+            var authorDto = new UserDto
             {
                 Email = post.Author.Email,
                 Id = post.Author.Id,
@@ -123,7 +123,7 @@ public class RoutePostsController : ControllerBase
 
     private PostDto GetRoutePostDto(Post post)
     {
-        var authorDto = new UserSelectedDataDto
+        var authorDto = new UserDto
         {
             Email = post.Author.Email,
             Id = post.Author.Id,

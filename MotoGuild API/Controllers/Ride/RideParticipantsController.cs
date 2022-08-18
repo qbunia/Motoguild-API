@@ -77,9 +77,9 @@ public class RideParticipantsController : ControllerBase
         _db.SaveChanges();
     }
 
-    private UserSelectedDataDto GetRideParticipantDto(User participant)
+    private UserDto GetRideParticipantDto(User participant)
     {
-        var participantDto = new UserSelectedDataDto()
+        var participantDto = new UserDto()
         {
             Email = participant.Email,
             Id = participant.Id,
@@ -89,12 +89,12 @@ public class RideParticipantsController : ControllerBase
         return participantDto;
     }
 
-    private List<UserSelectedDataDto> GetRideParticipantsDtos(List<User> participants)
+    private List<UserDto> GetRideParticipantsDtos(List<User> participants)
     {
-        var participantsDtos = new List<UserSelectedDataDto>();
+        var participantsDtos = new List<UserDto>();
         foreach (var participant in participants)
         {
-            participantsDtos.Add(new UserSelectedDataDto()
+            participantsDtos.Add(new UserDto()
             {
                 Email = participant.Email, Rating = participant.Rating, Id = participant.Id,
                 UserName = participant.UserName
