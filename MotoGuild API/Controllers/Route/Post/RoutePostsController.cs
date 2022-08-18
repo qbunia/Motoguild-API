@@ -8,64 +8,64 @@ using MotoGuild_API.Models.User;
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
-[Route("api/groups/{groupId:int}/posts")]
-public class GroupPostsController : ControllerBase
+[Route("api/routes/{routeId:int}/posts")]
+public class RoutePostsController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
 
-    public GroupPostsController(MotoGuildDbContext dbContext)
+    public RoutePostsController(MotoGuildDbContext dbContext)
     {
         _db = dbContext;
     }
 
     [HttpGet]
-    public IActionResult GetGroupPosts(int groupId)
+    public IActionResult GetRoutePosts(int routeId)
     {
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
 
-        var postsId = group.Posts.Select(p => p.Id);
+        var postsId = route.Posts.Select(p => p.Id);
 
         var posts = _db.Posts
             .Include(p => p.Author)
             .Where(p => postsId.Contains(p.Id)).ToList();
 
         if (posts == null) return NotFound();
-        var postsDto = GetGroupPostsDtos(posts);
+        var postsDto = GetRoutePostsDtos(posts);
         return Ok(postsDto);
     }
 
-    [HttpGet("{id:int}", Name = "GetGroupPost")]
-    public IActionResult GetGroupPost(int groupId, int id)
+    [HttpGet("{id:int}", Name = "GetRoutePost")]
+    public IActionResult GetRoutePost(int routeId, int id)
     {
-        var group = _db.Groups
+        var route = _db.Routes
             .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+            .FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
         var post = _db.Posts
             .Include(p => p.Author)
             .FirstOrDefault(p => p.Id == id);
 
         if (post == null) return NotFound();
 
-        var postDto = GetGroupPostDto(post);
+        var postDto = GetRoutePostDto(post);
         return Ok(postDto);
     }
 
     [HttpPost]
-    public IActionResult CreateGroupPost(int groupId, [FromBody] CreatePostDto createPostDto)
+    public IActionResult CreateGroupPost(int routeId, [FromBody] CreatePostDto createPostDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-        var post = SaveGroupPostToDataBase(createPostDto, group);
-        var postDto = GetGroupPostDto(post);
-        return CreatedAtRoute("GetGroupPost", new {groupId, id = postDto.Id}, postDto);
+        var route = _db.Routes.Include(g => g.Posts).FirstOrDefault(g => g.Id == routeId);
+        if (route == null) return NotFound();
+        var post = SaveRoutePostToDataBase(createPostDto, route);
+        var postDto = GetRoutePostDto(post);
+        return CreatedAtRoute("GetRoutePost", new { routeId, id = postDto.Id }, postDto);
     }
 
-    private Post SaveGroupPostToDataBase(CreatePostDto createUserDto, Group group)
+    private Post SaveRoutePostToDataBase(CreatePostDto createUserDto, Domain.Route route)
     {
         var author = _db.Users.FirstOrDefault(u => u.Id == createUserDto.Author.Id);
         var post = new Post
@@ -75,20 +75,20 @@ public class GroupPostsController : ControllerBase
             Content = createUserDto.Content,
             CreateTime = DateTime.Now
         };
-        group.Posts.Add(post);
+        route.Posts.Add(post);
         _db.SaveChanges();
         return post;
     }
 
 
     [HttpDelete("{id:int}")]
-    public IActionResult DeleteGroupPost(int groupId, int id)
+    public IActionResult DeleteGroupPost(int routeId, int id)
     {
-        var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(u => u.Id == groupId);
-        if (group == null) return NotFound();
+        var route = _db.Routes.Include(g => g.Posts).FirstOrDefault(u => u.Id == routeId);
+        if (route == null) return NotFound();
 
         var post = _db.Posts.FirstOrDefault(p => p.Id == id);
-        if (!group.Posts.Contains(post)) return NotFound();
+        if (!route.Posts.Contains(post)) return NotFound();
 
         _db.Posts.Remove(post);
         _db.SaveChanges();
@@ -96,7 +96,7 @@ public class GroupPostsController : ControllerBase
     }
 
 
-    private List<PostDto> GetGroupPostsDtos(List<Post> posts)
+    private List<PostDto> GetRoutePostsDtos(List<Post> posts)
     {
         var postsDtos = new List<PostDto>();
         foreach (var post in posts)
@@ -121,7 +121,7 @@ public class GroupPostsController : ControllerBase
         return postsDtos;
     }
 
-    private PostDto GetGroupPostDto(Post post)
+    private PostDto GetRoutePostDto(Post post)
     {
         var authorDto = new UserDto
         {
