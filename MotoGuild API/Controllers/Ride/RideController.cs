@@ -53,7 +53,7 @@ namespace MotoGuild_API.Controllers
 
             var ride = SaveRideToDatabase(createRideDto);
             var rideDto = GetRideDto(ride);
-            return CreatedAtRoute("GetRode", new {id = rideDto.Id}, rideDto);
+            return CreatedAtRoute("GetRide", new {id = rideDto.Id}, rideDto);
         }
 
         private bool UserExists(int id)
@@ -61,23 +61,33 @@ namespace MotoGuild_API.Controllers
             return _db.Users.FirstOrDefault(u => u.Id == id) != null;
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public IActionResult UpdateRide(int id, [FromBody] UpdateRideDto updateRideDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var ride = _db.Rides.FirstOrDefault(r => r.Id == id);
             if (ride == null)
             {
                 return NotFound();
             }
-            UpdateRideInDatabase(ride, updateRideDto);
+            UpdateRideData(ride, updateRideDto);
             return NoContent();
         }
+
+        private void UpdateRideData(Ride ride, UpdateRideDto updateRideDto)
+        {
+            ride.Name = updateRideDto.Name;
+            ride.Description = updateRideDto.Description;
+            ride.StartPlace = updateRideDto.StartPlace;
+            ride.StartTime = updateRideDto.StartTime;
+            ride.EndingPlace = updateRideDto.EndingPlace;          
+            ride.Estimation = updateRideDto.Estimation;
+            ride.MinimumRating = updateRideDto.MinimumRating;
+            _db.SaveChanges();
+        }
+
+
         
-        [HttpDelete("{id;int}")]
+        [HttpDelete("{id:int}")]
         public IActionResult DeleteRide(int id)
         {
             var ride = _db.Rides.FirstOrDefault(r => r.Id == id);
@@ -87,16 +97,16 @@ namespace MotoGuild_API.Controllers
             }
             _db.Rides.Remove(ride);
             _db.SaveChanges();
-            return NoContent();
+            return Ok();
         }
         
         private Ride SaveRideToDatabase(CreateRideDto createRideDto)
         {
-            var owner = _db.Users.FirstOrDefault(o => o.Id == createRideDto.OwnerId);
+            User owner = _db.Users.FirstOrDefault(o => o.Id == createRideDto.Owner.Id);
             var participantsList = new List<User>();
             participantsList.Add(owner);
 
-
+            
             var ride = new Ride
             {
                 Name = createRideDto.Name,
@@ -106,6 +116,8 @@ namespace MotoGuild_API.Controllers
                 EndingPlace = createRideDto.EndingPlace,
                 Owner = owner,
                 Participants = participantsList,
+                Estimation = createRideDto.Estimation,
+                MinimumRating = createRideDto.MinimumRating,
                 Posts = new List<Post>(),
                 Stops = new List<Stop>()
 

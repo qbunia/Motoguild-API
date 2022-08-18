@@ -22,14 +22,16 @@ namespace MotoGuild_API.Models.Ride
         [Required]
         public DateTime StartTime { get; set; }
         
-        public int OwnerId { get; set; }
-        public List<UserSelectedDataDto> Participants { get; set; }
-        public List<PostDto> Posts { get; set; }
+        public UserRideDto Owner { get; set; }
+        public ICollection<UserSelectedDataDto> Participants { get; set; } = new List<UserSelectedDataDto>();
+        public ICollection<PostDto>? Posts { get; set; } = new List<PostDto>();
 
-        public ICollection<StopDto>? Stops { get; set; }
+        public ICollection<StopDto>? Stops { get; set; } = new List<StopDto>();
 
-
-
+        public int MinimumRating { get; set; }
+        public int Estimation { get; set; }
 
     }
+
+
 }

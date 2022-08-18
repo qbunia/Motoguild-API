@@ -17,11 +17,14 @@ namespace MotoGuild_API.Models.Ride
         public string EndingPlace { get; set; }
         [Required]
         public DateTime StartTime { get; set; }
-        public int OwnerId { get; set; }
-        
+        public UserRideDto Owner { get; set; }
+        public int MinimumRating { get; set; }
+        public int Estimation { get; set; }
 
+    }
 
-
-
+    public class UserRideDto
+    {
+        public int Id { get; set; }
     }
 }
