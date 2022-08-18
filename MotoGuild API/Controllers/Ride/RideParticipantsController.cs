@@ -71,7 +71,7 @@ public class RideParticipantsController : ControllerBase
 
     }
 
-    private void AddRideParticipantToRide(Ride ride, User participant)
+    private void AddRideParticipantToRide(Domain.Ride ride, User participant)
     {
         ride.Participants.Add(participant);
         _db.SaveChanges();
@@ -122,7 +122,7 @@ public class RideParticipantsController : ControllerBase
         return NoContent();
     }
     
-    private void DeleteRideParticipantFromRide(Ride ride, User participant)
+    private void DeleteRideParticipantFromRide(Domain.Ride ride, User participant)
     {
         ride.Participants.Remove(participant);
         _db.SaveChanges();
