@@ -3,6 +3,7 @@ using Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Ride;
+using MotoGuild_API.Models.User;
 
 namespace MotoGuild_API.Controllers
 {
@@ -50,11 +51,6 @@ namespace MotoGuild_API.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!UserExists(createRideDto.OwnerId))
-            {
-                ModelState.AddModelError(key: "Description", errorMessage: "User not found");
-            }
-
             var ride = SaveRideToDatabase(createRideDto);
             var rideDto = GetRideDto(ride);
             return CreatedAtRoute("GetRode", new {id = rideDto.Id}, rideDto);
@@ -96,16 +92,26 @@ namespace MotoGuild_API.Controllers
         
         private Ride SaveRideToDatabase(CreateRideDto createRideDto)
         {
+            var owner = _db.Users.FirstOrDefault(o => o.Id == createRideDto.OwnerId);
+            var participantsList = new List<User>();
+            participantsList.Add(owner);
+
+
             var ride = new Ride
             {
                 Name = createRideDto.Name,
                 Description = createRideDto.Description,
-                Owner = createRideDto.Owner,
                 StartPlace = createRideDto.StartPlace,
                 StartTime = createRideDto.StartTime,
-                EndPlace = createRideDto.EndPlace,
-  
+                EndingPlace = createRideDto.EndingPlace,
+                Owner = owner,
+                Participants = participantsList,
+                Posts = new List<Post>(),
+                Stops = new List<Stop>()
+
+
             };
+            
             _db.Rides.Add(ride);
             _db.SaveChanges();
             return ride;
@@ -115,10 +121,9 @@ namespace MotoGuild_API.Controllers
         {
             ride.Name = updateRideDto.Name;
             ride.Description = updateRideDto.Description;
-            ride.Owner = updateRideDto.Owner;
             ride.StartPlace = updateRideDto.StartPlace;
             ride.StartTime = updateRideDto.StartTime;
-            ride.EndPlace = updateRideDto.EndPlace;
+            ride.EndingPlace = updateRideDto.EndingPlace;
             _db.SaveChanges();
         }
         
@@ -129,10 +134,9 @@ namespace MotoGuild_API.Controllers
                 Id = ride.Id,
                 Name = ride.Name,
                 Description = ride.Description,
-                Owner = ride.Owner,
                 StartPlace = ride.StartPlace,
                 StartTime = ride.StartTime,
-                EndPlace = ride.EndPlace,
+                EndingPlace = ride.EndingPlace,
                
             };
         }
@@ -144,11 +148,11 @@ namespace MotoGuild_API.Controllers
                 Id = r.Id,
                 Name = r.Name,
                 Description = r.Description,
-                Owner = r.Owner,
                 StartPlace = r.StartPlace,
                 StartTime = r.StartTime,
-                EndPlace = r.EndPlace,
+                EndingPlace = r.EndingPlace,
                
+
             }).ToList();
         }
         
