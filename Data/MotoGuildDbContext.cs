@@ -13,6 +13,7 @@ namespace Data
         public DbSet<Route> Routes { get; set; }
         public DbSet<Stop> Stops { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Feed> Feed { get; set; }
 
         public MotoGuildDbContext(DbContextOptions options) : base(options)
         { }

@@ -9,6 +9,6 @@ namespace MotoGuild_API.Models.Post
         public UserSelectedDataDto Author { get; set; }
         public DateTime CreateTime { get; set; }
         public string Content { get; set; }
-        public ICollection<CommentDto> Comments { get; set; } = new List<CommentDto>();
     }
+
 }

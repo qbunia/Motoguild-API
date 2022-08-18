@@ -9,4 +9,6 @@ namespace MotoGuild_API.Models.Comment
         public DateTime CreateTime { get; set; }
         public string Content { get; set; }
     }
+
+    
 }
