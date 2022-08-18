@@ -57,7 +57,12 @@ public class GroupController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var group = SaveGroupToDataBase(createGroupDto);
-        var groupDto = GetGroupDto(group);
+        var groupFull = _db.Groups
+            .Include(g => g.PendingUsers)
+            .Include(g => g.Posts)
+            .Include(g => g.Participants)
+            .FirstOrDefault(g => g.Id == group.Id);
+        var groupDto = GetGroupDto(groupFull);
         return CreatedAtRoute("GetGroup", new {id = groupDto.Id}, groupDto);
     }
 
