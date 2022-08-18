@@ -62,13 +62,22 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpPost]
-        public IActionResult CreateRouteStop([FromBody] CreateStopDto createStopDto)
+        public IActionResult CreateRouteStop(int routeId,[FromBody] CreateStopDto createStopDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var stop = SaveRouteToDataBase(createStopDto);
+            var route = _db.Routes
+                .Include(r => r.Stops)
+                .FirstOrDefault(r => r.Id == routeId);
+
+            if (route == null)
+            {
+                return NotFound();
+            }
+
+            var stop = SaveRouteToDataBase(createStopDto, route);
             var stopDto = GetRouteStopDto(stop);
-            return CreatedAtRoute("GetRouteStop", new { id = stopDto.Id }, stopDto);
+            return CreatedAtRoute("GetRouteStop", new { id = stopDto.Id, routeId =  routeId}, stopDto);
         }
 
         [HttpDelete("{id:int}")]
@@ -127,7 +136,7 @@ namespace MotoGuild_API.Controllers.Route
         }
 
 
-        private Stop SaveRouteToDataBase(CreateStopDto createStopDto)
+        private Stop SaveRouteToDataBase(CreateStopDto createStopDto, Domain.Route route)
         {
             var stop = new Stop()
             {
@@ -135,7 +144,7 @@ namespace MotoGuild_API.Controllers.Route
                 Name = createStopDto.Name,
                 Place = createStopDto.Place
             };
-            _db.Stops.Add(stop);
+            route.Stops.Add(stop);
             _db.SaveChanges();
             return stop;
         }
