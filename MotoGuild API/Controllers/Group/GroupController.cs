@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Group;
@@ -10,6 +11,7 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups")]
+[EnableCors("AllowAnyOrigin")]
 public class GroupController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
