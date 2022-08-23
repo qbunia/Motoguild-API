@@ -40,6 +40,7 @@ namespace MotoGuild_API.Controllers.Ride.Post
                     UserName = post.Author.UserName
                 };
 
+
                 postsDto.Add(new PostDto
                 {
                     Author = authorDto,
