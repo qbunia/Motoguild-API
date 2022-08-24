@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Post;
@@ -9,6 +10,7 @@ namespace MotoGuild_API.Controllers.Ride.Post
 {
     [ApiController]
     [Route("api/rides/{rideId:int}/posts")]
+    [EnableCors("AllowAnyOrigin")]
     public class RidePostsController : ControllerBase
     {
         private MotoGuildDbContext _db;
@@ -30,25 +32,25 @@ namespace MotoGuild_API.Controllers.Ride.Post
         private List<PostDto> GetRidePostsDtos(List<Domain.Post> posts)
         {
             var postsDto = new List<PostDto>();
-            foreach (var post in posts)
-            {
-                var authorDto = new UserSelectedDataDto
-                {
-                    Email = post.Author.Email,
-                    Id = post.Author.Id,
-                    Rating = post.Author.Rating,
-                    UserName = post.Author.UserName
-                };
+            //foreach (var post in posts)
+            //{
+            //    var authorDto = new UserSelectedDataDto
+            //    {
+            //        Email = post.Author.Email,
+            //        Id = post.Author.Id,
+            //        Rating = post.Author.Rating,
+            //        UserName = post.Author.UserName
+            //    };
 
 
-                postsDto.Add(new PostDto
-                {
-                    Author = authorDto,
-                    Content = post.Content,
-                    CreateTime = post.CreateTime,
-                    Id = post.Id
-                });
-            }
+            //    postsDto.Add(new PostDto
+            //    {
+            //        Author = authorDto,
+            //        Content = post.Content,
+            //        CreateTime = post.CreateTime,
+            //        Id = post.Id
+            //    });
+            //}
             return postsDto;
         }
 
@@ -75,22 +77,22 @@ namespace MotoGuild_API.Controllers.Ride.Post
 
         private PostDto GetRidePostDto(Domain.Post post)
         {
-            var authorDto = new UserSelectedDataDto
-            {
-                Email = post.Author.Email,
-                Id = post.Author.Id,
-                Rating = post.Author.Rating,
-                UserName = post.Author.UserName
-            };
+            //var authorDto = new UserSelectedDataDto
+            //{
+            //    Email = post.Author.Email,
+            //    Id = post.Author.Id,
+            //    Rating = post.Author.Rating,
+            //    UserName = post.Author.UserName
+            //};
 
-            var postDto = new PostDto
-            {
-                Author = authorDto,
-                Content = post.Content,
-                CreateTime = post.CreateTime,
-                Id = post.Id
-            };
-            return postDto;
+            //var postDto = new PostDto
+            //{
+            //    Author = authorDto,
+            //    Content = post.Content,
+            //    CreateTime = post.CreateTime,
+            //    Id = post.Id
+            //};
+            return  new PostDto();
         }
 
         [HttpPost]

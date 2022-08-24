@@ -1,6 +1,7 @@
 using System.Runtime.ExceptionServices;
 using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.User;
@@ -11,6 +12,7 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/rides/{rideId:int}/participants")]
+[EnableCors("AllowAnyOrigin")]
 public class RideParticipantsController : ControllerBase
 {
     private MotoGuildDbContext _db;

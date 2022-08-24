@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Ride;
@@ -9,6 +10,7 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowAnyOrigin")]
     public class RideController : ControllerBase
     {
         private MotoGuildDbContext _db;
