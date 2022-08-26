@@ -183,6 +183,7 @@ public class GroupController : ControllerBase
                 Rating = pendingUser.Rating,
                 UserName = pendingUser.UserName
             });
+        var rating = group.Participants.Select(p => p.Rating).Average();
 
         var postsDto = new List<PostDto>();
         foreach (var post in group.Posts)
@@ -212,7 +213,8 @@ public class GroupController : ControllerBase
             CreationDate = group.CreationDate,
             Participants = participantsDto,
             PendingUsers = pendingUserDto,
-            Posts = postsDto
+            Posts = postsDto,
+            Rating = rating
         };
         return groupDto;
     }

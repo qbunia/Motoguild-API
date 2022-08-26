@@ -17,6 +17,7 @@ namespace MotoGuild_API.Models.Group
         public List<UserDto> Participants { get; set; }
         public List<UserDto> PendingUsers { get; set; }
         public List<PostDto> Posts { get; set; }
+        public double Rating { get; set; }
     }
 
     public class SelectedGroupDto
