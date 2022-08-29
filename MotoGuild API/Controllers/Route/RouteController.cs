@@ -35,7 +35,7 @@ namespace MotoGuild_API.Controllers.Route
                 routes = _db.Routes
                     .Include(r => r.Owner)
                     .OrderByDescending(r=>r.Rating)
-                    .Take(9)
+                    .Take(5)
                     .ToList();
             }
            
