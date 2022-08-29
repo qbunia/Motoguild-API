@@ -1,176 +1,75 @@
-﻿//using Data;
-//using Domain;
-//using Microsoft.AspNetCore.Cors;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using MotoGuild_API.Models.Ride;
-//using MotoGuild_API.Models.User;
+﻿using AutoMapper;
+using Domain;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using MotoGuild_API.Models.Ride;
+using MotoGuild_API.Repository.Interface;
 
-//namespace MotoGuild_API.Controllers
-//{
-//    [ApiController]
-//    [Route("api/[controller]")]
-//    [EnableCors("AllowAnyOrigin")]
-//    public class RideController : ControllerBase
-//    {
-//        private MotoGuildDbContext _db;
+namespace MotoGuild_API.Controllers;
 
-//        public RideController(MotoGuildDbContext dbContext)
-//        {
-//            _db = dbContext;
-//        }
+[ApiController]
+[Route("api/rides")]
+[EnableCors("AllowAnyOrigin")]
 
-//        [HttpGet]
-//        public IActionResult GetRides()
-//        {
-//            var rides = _db.Rides.Include(r => r.Owner).Include(r => r.Participants).ToList();
+public class RideController : ControllerBase
+{
+    private readonly IRideRepository _rideRepository;
+    private readonly IMapper _mapper;
 
-//            var RidesDto = GetRidesDto(rides);
-//            return Ok(RidesDto);
-//        }
+    public RideController(IRideRepository rideRepository, IMapper mapper)
+    {
+        _rideRepository = rideRepository;
+        _mapper = mapper;
+    }
 
-//        [HttpGet("{id}", Name = "GetRide")]
-//        public IActionResult GetRide(int id, [FromQuery] bool selectedData = false)
-//        {
-//            Domain.Ride ride = _db.Rides
-//                .Include(r => r.Owner)
-//                .Include(r => r.Participants)
-//                .FirstOrDefault(r => r.Id == id);
-//            if (ride == null)
-//            {
-//                return NotFound();
-//            }
+    [HttpGet]
+    public IActionResult GetRides()
+    {
+        var rides = _rideRepository.GetAll();
+        return Ok(_mapper.Map<List<RideDto>>(rides));
+    }
 
-//            var rideDto = GetRideDto(ride);
-//            return Ok(rideDto);
-//        }
+    [HttpGet("{id:int}", Name = "GetRide")]
+    public IActionResult GetRide(int id, [FromQuery] bool selectedData = false)
+    {
+        var ride = _rideRepository.Get(id);
+        if (ride == null) return NotFound();
+        return Ok(_mapper.Map<RideDto>(ride));
+    }
 
-//        [HttpPost]
-//        public IActionResult CreateRide([FromBody] CreateRideDto createRideDto)
-//        {
-//            if (!ModelState.IsValid)
-//            {
-//                return BadRequest(ModelState);
-//            }
+    [HttpPost]
+    public IActionResult CreateRide([FromBody] CreateRideDto createRideDto)
+    {
+        var ride = _mapper.Map<Domain.Ride>(createRideDto);
+        _rideRepository.Insert(ride);
+        _rideRepository.Save();
+        var rideDto = _mapper.Map<RideDto>(ride);
+        return CreatedAtRoute("GetRide", new { id = rideDto.Id }, rideDto);
+    }
 
-//            var ride = SaveRideToDatabase(createRideDto);
-//            var rideDto = GetRideDto(ride);
-//            return CreatedAtRoute("GetRide", new {id = rideDto.Id}, rideDto);
-//        }
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteRide(int id)
+    {
+        var ride = _rideRepository.Get(id);
+        if (ride == null) return NotFound();
+        _rideRepository.Delete(id);
+        _rideRepository.Save();
+        return NoContent();
+    }
 
-//        private bool UserExists(int id)
-//        {
-//            return _db.Users.FirstOrDefault(u => u.Id == id) != null;
-//        }
-
-//        [HttpPut("{id:int}")]
-//        public IActionResult UpdateRide(int id, [FromBody] UpdateRideDto updateRideDto)
-//        {
-//            var ride = _db.Rides.FirstOrDefault(r => r.Id == id);
-//            if (ride == null)
-//            {
-//                return NotFound();
-//            }
-//            UpdateRideData(ride, updateRideDto);
-//            return NoContent();
-//        }
-
-//        private void UpdateRideData(Domain.Ride ride, UpdateRideDto updateRideDto)
-//        {
-//            ride.Name = updateRideDto.Name;
-//            ride.Description = updateRideDto.Description;
-//            ride.StartPlace = updateRideDto.StartPlace;
-//            ride.StartTime = updateRideDto.StartTime;
-//            ride.EndingPlace = updateRideDto.EndingPlace;          
-//            ride.Estimation = updateRideDto.Estimation;
-//            ride.MinimumRating = updateRideDto.MinimumRating;
-           
-//            _db.SaveChanges();
-//        }
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateRide(int id, [FromBody] UpdateRideDto updateRideDto)
+    {
+        var ride = _rideRepository.Get(id);
+        if (ride == null) return NotFound();
+        _mapper.Map(updateRideDto, ride);
+        _rideRepository.Update(ride);
+        _rideRepository.Save();
+        return NoContent();
+    }
 
 
-        
-//        [HttpDelete("{id:int}")]
-//        public IActionResult DeleteRide(int id)
-//        {
-//            var ride = _db.Rides.FirstOrDefault(r => r.Id == id);
-//            if (ride == null)
-//            {
-//                return NotFound();
-//            }
-//            _db.Rides.Remove(ride);
-//            _db.SaveChanges();
-//            return Ok();
-//        }
-        
-//        private Domain.Ride SaveRideToDatabase(CreateRideDto createRideDto)
-//        {
-//            User owner = _db.Users.FirstOrDefault(o => o.Id == createRideDto.Owner.Id);
-//            var participantsList = new List<User>();
-//            participantsList.Add(owner);
-
-            
-//            var ride = new Domain.Ride
-//            {
-//                Name = createRideDto.Name,
-//                Description = createRideDto.Description,
-//                StartPlace = createRideDto.StartPlace,
-//                StartTime = createRideDto.StartTime,
-//                EndingPlace = createRideDto.EndingPlace,
-//                Owner = owner,
-//                Participants = participantsList,
-//                Estimation = createRideDto.Estimation,
-//                MinimumRating = createRideDto.MinimumRating,
-//                Posts = new List<Post>(),
-//                Stops = new List<Stop>()
 
 
-//            };
-            
-//            _db.Rides.Add(ride);
-//            _db.SaveChanges();
-//            return ride;
-//        }
-        
-//        private void UpdateRideInDatabase(Domain.Ride ride, UpdateRideDto updateRideDto)
-//        {
-//            ride.Name = updateRideDto.Name;
-//            ride.Description = updateRideDto.Description;
-//            ride.StartPlace = updateRideDto.StartPlace;
-//            ride.StartTime = updateRideDto.StartTime;
-//            ride.EndingPlace = updateRideDto.EndingPlace;
-//            _db.SaveChanges();
-//        }
-        
-//        private RideDto GetRideDto(Domain.Ride ride)
-//        {
-//            return new RideDto
-//            {
-//                Id = ride.Id,
-//                Name = ride.Name,
-//                Description = ride.Description,
-//                StartPlace = ride.StartPlace,
-//                StartTime = ride.StartTime,
-//                EndingPlace = ride.EndingPlace,
-               
-//            };
-//        }
-        
-//        private List<RideDto> GetRidesDto(List<Domain.Ride> rides)
-//        {
-//            return rides.Select(r => new RideDto
-//            {
-//                Id = r.Id,
-//                Name = r.Name,
-//                Description = r.Description,
-//                StartPlace = r.StartPlace,
-//                StartTime = r.StartTime,
-//                EndingPlace = r.EndingPlace,
-               
 
-//            }).ToList();
-//        }
-        
-        
-//    }
-//}
+}
