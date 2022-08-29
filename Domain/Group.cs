@@ -15,7 +15,7 @@ namespace Domain
     
         public ICollection<Post> Posts { get; set; }
         public bool IsPrivate { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime? CreationDate { get; set; }
         public ICollection<User> PendingUsers { get; set; }
     }
 }
