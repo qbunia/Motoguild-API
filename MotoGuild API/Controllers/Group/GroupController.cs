@@ -1,11 +1,9 @@
-﻿using Data;
+﻿using AutoMapper;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Group;
-using MotoGuild_API.Models.Post;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
 
@@ -14,206 +12,60 @@ namespace MotoGuild_API.Controllers;
 [EnableCors("AllowAnyOrigin")]
 public class GroupController : ControllerBase
 {
-    private readonly MotoGuildDbContext _db;
+    private readonly IGroupRepository _groupRepository;
+    private readonly IMapper _mapper;
 
-    public GroupController(MotoGuildDbContext dbContext)
+    public GroupController(IGroupRepository groupRepository, IMapper mapper)
     {
-        _db = dbContext;
+        _groupRepository = groupRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult GetGroups()
     {
-        var groups = _db.Groups
-            .Include(g => g.Owner)
-            .Include(g => g.Participants)
-            .Include(g => g.PendingUsers)
-            .Include(g => g.Posts).ThenInclude(p => p.Author)
-            .ToList();
-        var groupsDto = GetGroupsDtos(groups);
-        return Ok(groupsDto);
+        var groups = _groupRepository.GetAll();
+        return Ok(_mapper.Map<List<SelectedGroupDto>>(groups));
     }
 
     [HttpGet("{id:int}", Name = "GetGroup")]
     public IActionResult GetGroup(int id, [FromQuery] bool selectedData = false)
     {
-        var group = _db.Groups
-            .Include(g => g.Owner)
-            .Include(g => g.Participants)
-            .Include(g => g.PendingUsers)
-            .Include(g => g.Posts).ThenInclude(p => p.Author)
-            .FirstOrDefault(g => g.Id == id);
+        var group = _groupRepository.Get(id);
         if (group == null) return NotFound();
-
-        var groupDto = GetGroupDto(group);
-        return Ok(groupDto);
+        return Ok(_mapper.Map<SelectedGroupDto>(group));
     }
 
     [HttpPost]
     public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
     {
-        if (!UserExists(createGroupDto.OwnerId)) ModelState.AddModelError("Description", "User not found");
-
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        var group = SaveGroupToDataBase(createGroupDto);
-        var groupFull = _db.Groups
-            .Include(g => g.PendingUsers)
-            .Include(g => g.Posts)
-            .Include(g => g.Participants)
-            .FirstOrDefault(g => g.Id == group.Id);
-        var groupDto = GetGroupDto(groupFull);
+        var group = _mapper.Map<Group>(createGroupDto);
+        _groupRepository.Insert(group);
+        _groupRepository.Save();
+        var groupDto = _mapper.Map<SelectedGroupDto>(group);
         return CreatedAtRoute("GetGroup", new {id = groupDto.Id}, groupDto);
     }
 
     [HttpDelete("{id:int}")]
     public IActionResult DeleteGroup(int id)
     {
-        var group = _db.Groups.FirstOrDefault(u => u.Id == id);
+        var group = _groupRepository.Get(id);
         if (group == null) return NotFound();
 
-        _db.Remove(group);
-        _db.SaveChanges();
+        _groupRepository.Delete(id);
+        _groupRepository.Save();
         return Ok();
     }
 
     [HttpPut("{id:int}")]
     public IActionResult UpdateGroup(int id, [FromBody] UpdateGroupDto updateGroupDto)
     {
+        updateGroupDto.Id = id;
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        var group = _db.Groups.FirstOrDefault(i => i.Id == id);
-        if (group == null) return NotFound();
-        UpdateGroupData(group, updateGroupDto);
+        var updateGroup = _mapper.Map<Group>(updateGroupDto);
+        _groupRepository.Update(updateGroup);
+        _groupRepository.Save();
         return NoContent();
     }
 
-    private void UpdateGroupData(Group group, UpdateGroupDto updateGroupDto)
-    {
-        group.Name = updateGroupDto.Name;
-        group.IsPrivate = updateGroupDto.IsPrivate;
-        _db.SaveChanges();
-    }
-
-
-    private bool UserExists(int id)
-    {
-        return _db.Users.FirstOrDefault(u => u.Id == id) != null;
-    }
-
-    private Group SaveGroupToDataBase(CreateGroupDto createGroupDto)
-    {
-        var owner = _db.Users.FirstOrDefault(u => u.Id == createGroupDto.OwnerId);
-        var group = new Group
-        {
-            Name = createGroupDto.Name,
-            CreationDate = DateTime.Now,
-            IsPrivate = createGroupDto.IsPrivate,
-            Owner = owner,
-            Participants = new List<User>()
-        };
-        group.Participants.Add(owner);
-        _db.Groups.Add(group);
-        _db.SaveChanges();
-        return group;
-    }
-
-
-    private List<SelectedGroupDto> GetGroupsDtos(List<Group> groups)
-    {
-        var groupsDtos = new List<SelectedGroupDto>();
-        foreach (var group in groups)
-        {
-            var userDto = new UserDto
-            {
-                Email = group.Owner.Email,
-                Id = group.Owner.Id,
-                Rating = group.Owner.Rating,
-                UserName = group.Owner.UserName
-            };
-            var participantsDto = new List<UserDto>();
-            foreach (var participant in group.Participants)
-                participantsDto.Add(new UserDto
-                {
-                    Email = participant.Email,
-                    Id = participant.Id,
-                    Rating = participant.Rating,
-                    UserName = participant.UserName
-                });
-
-            var rating = group.Participants.Select(p => p.Rating).Average();
-
-            groupsDtos.Add(new SelectedGroupDto
-            {
-                Id = group.Id,
-                IsPrivate = group.IsPrivate,
-                Name = group.Name, Owner = userDto,
-                Participants = participantsDto,
-                Rating = rating
-            });
-        }
-
-        return groupsDtos;
-    }
-
-    private GroupDto GetGroupDto(Group group)
-    {
-        var userDto = new UserDto
-        {
-            Email = group.Owner.Email,
-            Id = group.Owner.Id,
-            Rating = group.Owner.Rating,
-            UserName = group.Owner.UserName
-        };
-        var participantsDto = new List<UserDto>();
-        foreach (var participant in group.Participants)
-            participantsDto.Add(new UserDto
-            {
-                Email = participant.Email,
-                Id = participant.Id,
-                Rating = participant.Rating,
-                UserName = participant.UserName
-            });
-
-        var pendingUserDto = new List<UserDto>();
-        foreach (var pendingUser in group.PendingUsers)
-            pendingUserDto.Add(new UserDto
-            {
-                Email = pendingUser.Email,
-                Id = pendingUser.Id,
-                Rating = pendingUser.Rating,
-                UserName = pendingUser.UserName
-            });
-
-        var postsDto = new List<PostDto>();
-        foreach (var post in group.Posts)
-        {
-            var authorDto = new UserDto
-            {
-                Email = post.Author.Email,
-                Id = post.Author.Id,
-                Rating = post.Author.Rating,
-                UserName = post.Author.UserName
-            };
-
-            postsDto.Add(new PostDto
-            {
-                Author = authorDto,
-                Content = post.Content,
-                CreateTime = post.CreateTime
-            });
-        }
-
-        var groupDto = new GroupDto
-        {
-            Id = group.Id,
-            IsPrivate = group.IsPrivate,
-            Name = group.Name,
-            Owner = userDto,
-            CreationDate = group.CreationDate,
-            Participants = participantsDto,
-            PendingUsers = pendingUserDto,
-            Posts = postsDto
-        };
-        return groupDto;
-    }
 }
