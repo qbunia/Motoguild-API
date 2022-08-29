@@ -25,6 +25,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IGroupParticipantsRepository, GroupParticipantsRepository>();
 builder.Services.AddScoped<IRideRepository, RideRepository>();
 
 var app = builder.Build();
