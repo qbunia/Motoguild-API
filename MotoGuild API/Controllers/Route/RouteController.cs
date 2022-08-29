@@ -1,10 +1,12 @@
-﻿using Data;
+﻿using AutoMapper;
+using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Route;
 using MotoGuild_API.Models.User;
+using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers.Route
 {
@@ -13,161 +15,74 @@ namespace MotoGuild_API.Controllers.Route
     [EnableCors("AllowAnyOrigin")]
     public class RouteController : ControllerBase
     {
-        private readonly MotoGuildDbContext _db;
 
-        public RouteController(MotoGuildDbContext dbContext)
+        private readonly IRouteRepository _routeRepository;
+        private readonly IMapper _mapper;
+
+        public RouteController(IRouteRepository routeRepository, IMapper mapper)
         {
-            _db = dbContext;
+            _routeRepository = routeRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult GetRoutes([FromQuery] bool orderByRating = false)
         {
-            var routes = new List<Domain.Route>();
             if (!orderByRating)
             {
-                routes = _db.Routes
-                    .Include(r => r.Owner)
-                    .ToList();
+                var routes = _routeRepository.GetAll();
+                return Ok(_mapper.Map<List<RouteDto>>(routes));
             }
             else
             {
-                routes = _db.Routes
-                    .Include(r => r.Owner)
-                    .OrderByDescending(r=>r.Rating)
-                    .Take(5)
-                    .ToList();
+                var selectedRoutes = _routeRepository.GetFiveOrderByRating();
+                return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
             }
-           
-            var routesDto = GetRoutesDtos(routes);
-            return Ok(routesDto);
+            
         }
 
         [HttpGet("{id:int}", Name = "GetRoute")]
         public IActionResult GetRoute(int id, [FromQuery] bool selectedData = false)
         {
-            var route = _db.Routes
-                .Include(r => r.Owner)
-                .FirstOrDefault(r => r.Id == id);
+            var route = _routeRepository.Get(id);
             if (route == null) return NotFound();
+            return Ok(_mapper.Map<FullRouteDto>(route));
 
-            var routeDto = GetRouteDto(route);
-            return Ok(routeDto);
         }
 
         [HttpPost]
         public IActionResult CreateRoute([FromBody] CreateRouteDto createRouteDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var route = SaveRouteToDataBase(createRouteDto);
-            var routeDto = GetRouteDto(route);
+            var route = _mapper.Map<Domain.Route>(createRouteDto);
+            _routeRepository.Insert(route);
+            _routeRepository.Save();
+            var routeDto = _mapper.Map<FullRouteDto>(route);
             return CreatedAtRoute("GetRoute", new { id = routeDto.Id }, routeDto);
         }
 
         [HttpDelete("{id:int}")]
         public IActionResult DeleteRoute(int id)
         {
-            var route = _db.Routes
-                .FirstOrDefault(r => r.Id == id);
+            var route = _routeRepository.Get(id);
             if (route == null) return NotFound();
 
-            _db.Routes.Remove(route);
-            _db.SaveChanges();
+            _routeRepository.Delete(id);
+            _routeRepository.Save();
             return Ok();
+
         }
 
         [HttpPut("{id:int}")]
         public IActionResult UpdateRoute(int id, [FromBody] UpdateRouteDto updateRouteDto)
         {
+            updateRouteDto.Id = id;
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var route = _db.Routes.FirstOrDefault(i => i.Id == id);
-            if (route == null) return NotFound();
-            UpdateGroupData(route, updateRouteDto);
+            var updateRoute = _mapper.Map<Domain.Route>(updateRouteDto);
+            _routeRepository.Update(updateRoute);
+            _routeRepository.Save();
             return NoContent();
+
         }
 
-        private void UpdateGroupData(Domain.Route route, UpdateRouteDto updateGroupDto)
-        {
-            route.Description = updateGroupDto.Description;
-            route.Name = updateGroupDto.Name;
-            route.StartPlace = updateGroupDto.StartPlace;
-            route.EndingPlace = updateGroupDto.EndingPlace;
-            route.Rating = updateGroupDto.Rating;
-
-            _db.SaveChanges();
-        }
-
-
-        private Domain.Route SaveRouteToDataBase(CreateRouteDto createRouteDto)
-        {
-            var owner = _db.Users.FirstOrDefault(u => u.Id == createRouteDto.Owner.Id);
-            var route = new Domain.Route
-            {
-                Description = createRouteDto.Description,
-                EndingPlace = createRouteDto.EndingPlace,
-                Name = createRouteDto.Name,
-                Owner = owner,
-                Posts = new List<Post>(),
-                Rating = createRouteDto.Rating,
-                StartPlace = createRouteDto.StartPlace,
-                Stops = new List<Stop>()
-            };
-            _db.Routes.Add(route);
-            _db.SaveChanges();
-            return route;
-        }
-
-
-        private List<RouteDto> GetRoutesDtos(List<Domain.Route> routes)
-        {
-            var routeDtos = new List<RouteDto>();
-            foreach (var route in routes)
-            {
-                var owner = _db.Users.FirstOrDefault(u => u.Id == route.Owner.Id);
-                var ownerDto = new UserDto()
-                {
-                    Email = owner.Email,
-                    Id = owner.Id,
-                    Rating = owner.Rating,
-                    UserName = owner.UserName
-                };
-                routeDtos.Add(new RouteDto
-                {
-                    Description = route.Description,
-                    EndingPlace = route.EndingPlace,
-                    Id = route.Id,
-                    Name = route.Name,
-                    Rating = route.Rating,
-                    StartPlace = route.StartPlace,
-                    Owner = ownerDto
-                });
-            }
-
-            return routeDtos;
-        }
-
-        private RouteDto GetRouteDto(Domain.Route route)
-        {
-            var owner = _db.Users.FirstOrDefault(u => u.Id == route.Owner.Id);
-            var ownerDto = new UserDto()
-            {
-                Email = owner.Email,
-                Id = owner.Id,
-                Rating = owner.Rating,
-                UserName = owner.UserName
-            };
-            var routeDto = new RouteDto
-            {
-                Description = route.Description,
-                EndingPlace = route.EndingPlace,
-                Id = route.Id,
-                Name = route.Name,
-                Rating = route.Rating,
-                StartPlace = route.StartPlace,
-                Owner = ownerDto
-            };
-            return routeDto;
-        }
     }
 }

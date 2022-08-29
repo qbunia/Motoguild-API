@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MotoGuild_API.Models.User;
 
 namespace MotoGuild_API.Models.Route
 {
@@ -9,7 +10,7 @@ namespace MotoGuild_API.Models.Route
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public int Rating { get; set; }
-        public UserRouteDto Owner { get; set; }
+        public UserDto Owner { get; set; }
     }
 
  
