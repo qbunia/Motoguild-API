@@ -1,6 +1,7 @@
 using System.Runtime.ExceptionServices;
 using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.User;
@@ -11,6 +12,7 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/rides/{rideId:int}/participants")]
+[EnableCors("AllowAnyOrigin")]
 public class RideParticipantsController : ControllerBase
 {
     private MotoGuildDbContext _db;
@@ -71,7 +73,7 @@ public class RideParticipantsController : ControllerBase
 
     }
 
-    private void AddRideParticipantToRide(Ride ride, User participant)
+    private void AddRideParticipantToRide(Domain.Ride ride, User participant)
     {
         ride.Participants.Add(participant);
         _db.SaveChanges();
@@ -122,7 +124,7 @@ public class RideParticipantsController : ControllerBase
         return NoContent();
     }
     
-    private void DeleteRideParticipantFromRide(Ride ride, User participant)
+    private void DeleteRideParticipantFromRide(Domain.Ride ride, User participant)
     {
         ride.Participants.Remove(participant);
         _db.SaveChanges();

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Ride;
@@ -9,6 +10,7 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowAnyOrigin")]
     public class RideController : ControllerBase
     {
         private MotoGuildDbContext _db;
@@ -30,7 +32,7 @@ namespace MotoGuild_API.Controllers
         [HttpGet("{id}", Name = "GetRide")]
         public IActionResult GetRide(int id, [FromQuery] bool selectedData = false)
         {
-            Ride ride = _db.Rides
+            Domain.Ride ride = _db.Rides
                 .Include(r => r.Owner)
                 .Include(r => r.Participants)
                 .FirstOrDefault(r => r.Id == id);
@@ -73,7 +75,7 @@ namespace MotoGuild_API.Controllers
             return NoContent();
         }
 
-        private void UpdateRideData(Ride ride, UpdateRideDto updateRideDto)
+        private void UpdateRideData(Domain.Ride ride, UpdateRideDto updateRideDto)
         {
             ride.Name = updateRideDto.Name;
             ride.Description = updateRideDto.Description;
@@ -82,6 +84,7 @@ namespace MotoGuild_API.Controllers
             ride.EndingPlace = updateRideDto.EndingPlace;          
             ride.Estimation = updateRideDto.Estimation;
             ride.MinimumRating = updateRideDto.MinimumRating;
+           
             _db.SaveChanges();
         }
 
@@ -100,14 +103,14 @@ namespace MotoGuild_API.Controllers
             return Ok();
         }
         
-        private Ride SaveRideToDatabase(CreateRideDto createRideDto)
+        private Domain.Ride SaveRideToDatabase(CreateRideDto createRideDto)
         {
             User owner = _db.Users.FirstOrDefault(o => o.Id == createRideDto.Owner.Id);
             var participantsList = new List<User>();
             participantsList.Add(owner);
 
             
-            var ride = new Ride
+            var ride = new Domain.Ride
             {
                 Name = createRideDto.Name,
                 Description = createRideDto.Description,
@@ -129,7 +132,7 @@ namespace MotoGuild_API.Controllers
             return ride;
         }
         
-        private void UpdateRideInDatabase(Ride ride, UpdateRideDto updateRideDto)
+        private void UpdateRideInDatabase(Domain.Ride ride, UpdateRideDto updateRideDto)
         {
             ride.Name = updateRideDto.Name;
             ride.Description = updateRideDto.Description;
@@ -139,7 +142,7 @@ namespace MotoGuild_API.Controllers
             _db.SaveChanges();
         }
         
-        private RideDto GetRideDto(Ride ride)
+        private RideDto GetRideDto(Domain.Ride ride)
         {
             return new RideDto
             {
@@ -153,7 +156,7 @@ namespace MotoGuild_API.Controllers
             };
         }
         
-        private List<RideDto> GetRidesDto(List<Ride> rides)
+        private List<RideDto> GetRidesDto(List<Domain.Ride> rides)
         {
             return rides.Select(r => new RideDto
             {

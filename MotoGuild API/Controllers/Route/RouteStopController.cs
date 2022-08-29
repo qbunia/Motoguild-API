@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Route;
@@ -11,6 +12,7 @@ namespace MotoGuild_API.Controllers.Route
 {
     [ApiController]
     [Route("api/routes/{routeId:int}/stops")]
+    [EnableCors("AllowAnyOrigin")]
     public class RouteStopController : ControllerBase
     {
         private readonly MotoGuildDbContext _db;
