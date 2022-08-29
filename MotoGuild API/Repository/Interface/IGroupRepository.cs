@@ -2,7 +2,7 @@
 
 namespace MotoGuild_API.Repository.Interface
 {
-    public interface IGroupRepository : IRepository
+    public interface IGroupRepository : IDisposable
     {
         IEnumerable<Group> GetAll();
         Group Get(int groupId);
