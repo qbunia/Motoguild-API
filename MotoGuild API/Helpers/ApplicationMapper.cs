@@ -20,7 +20,8 @@ namespace MotoGuild_API.Helpers
             CreateMap<Domain.Route, RouteDto>().ReverseMap();
             CreateMap<Post, PostDto>();
             CreateMap<CreateRideDto, Ride>();
-         
+            CreateMap<CreateUserDto, User>().ReverseMap();
+            CreateMap<UpdateUserDto, User>().ReverseMap();
         }
     }
 }
