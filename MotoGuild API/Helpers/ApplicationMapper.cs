@@ -12,14 +12,14 @@ namespace MotoGuild_API.Helpers
     {
         public ApplicationMapper()
         {
-            CreateMap<Group, SelectedGroupDto>();
-            CreateMap<CreateGroupDto, Group>();
-            CreateMap<UpdateGroupDto, Group>();
+            CreateMap<Group, SelectedGroupDto>().ReverseMap();
+            CreateMap<CreateGroupDto, Group>().ReverseMap();
+            CreateMap<UpdateGroupDto, Group>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Ride, RideDto>().ReverseMap();
             CreateMap<Domain.Route, RouteDto>().ReverseMap();
-            CreateMap<Post, PostDto>();
-            CreateMap<CreateRideDto, Ride>();
+            CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<CreateRideDto, Ride>().ReverseMap();
             CreateMap<CreateUserDto, User>().ReverseMap();
             CreateMap<UpdateUserDto, User>().ReverseMap();
         }
