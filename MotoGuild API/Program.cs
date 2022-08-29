@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IRideRepository, RideRepository>();
+builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 
 var app = builder.Build();
 
