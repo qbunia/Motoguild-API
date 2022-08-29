@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Route;
@@ -9,6 +10,7 @@ namespace MotoGuild_API.Controllers.Route
 {
     [ApiController]
     [Route("api/routes")]
+    [EnableCors("AllowAnyOrigin")]
     public class RouteController : ControllerBase
     {
         private readonly MotoGuildDbContext _db;
@@ -19,11 +21,24 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpGet]
-        public IActionResult GetRoutes()
+        public IActionResult GetRoutes([FromQuery] bool orderByRating = false)
         {
-            var routes = _db.Routes
-                .Include(r => r.Owner)
-                .ToList();
+            var routes = new List<Domain.Route>();
+            if (!orderByRating)
+            {
+                routes = _db.Routes
+                    .Include(r => r.Owner)
+                    .ToList();
+            }
+            else
+            {
+                routes = _db.Routes
+                    .Include(r => r.Owner)
+                    .OrderByDescending(r=>r.Rating)
+                    .Take(9)
+                    .ToList();
+            }
+           
             var routesDto = GetRoutesDtos(routes);
             return Ok(routesDto);
         }

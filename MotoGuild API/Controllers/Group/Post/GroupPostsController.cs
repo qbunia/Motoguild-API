@@ -1,5 +1,6 @@
 ﻿using Data;
 using Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Models.Post;
@@ -9,6 +10,7 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:int}/posts")]
+[EnableCors("AllowAnyOrigin")]
 public class GroupPostsController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;
@@ -19,7 +21,7 @@ public class GroupPostsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetGroupPosts(int groupId)
+    public IActionResult GetGroupPosts(int groupId, [FromQuery] bool orderByDate = false)
     {
         var group = _db.Groups
             .Include(g => g.Posts)
@@ -27,10 +29,21 @@ public class GroupPostsController : ControllerBase
         if (group == null) return NotFound();
 
         var postsId = group.Posts.Select(p => p.Id);
+        var posts = new List<Post>();
 
-        var posts = _db.Posts
-            .Include(p => p.Author)
-            .Where(p => postsId.Contains(p.Id)).ToList();
+        if (orderByDate)
+        {
+            posts = _db.Posts
+                .Include(p => p.Author)
+                .Where(p => postsId.Contains(p.Id)).OrderByDescending(p => p.CreateTime).ToList();
+        }
+        else
+        {
+            posts = _db.Posts
+                .Include(p => p.Author)
+                .Where(p => postsId.Contains(p.Id)).ToList();
+        }
+
 
         if (posts == null) return NotFound();
         var postsDto = GetGroupPostsDtos(posts);
