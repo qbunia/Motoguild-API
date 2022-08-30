@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain;
 using MotoGuild_API.Dto.CommentDtos;
+using MotoGuild_API.Dto.FeedDtos;
 using MotoGuild_API.Dto.GroupDtos;
 using MotoGuild_API.Dto.PostDtos;
 using MotoGuild_API.Dto.RideDtos;
