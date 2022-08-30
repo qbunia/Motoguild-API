@@ -29,6 +29,7 @@ builder.Services.AddScoped<IGroupParticipantsRepository, GroupParticipantsReposi
 builder.Services.AddScoped<IRideRepository, RideRepository>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRouteStopsRepository, RouteStopsRepository>();
 
 var app = builder.Build();
 

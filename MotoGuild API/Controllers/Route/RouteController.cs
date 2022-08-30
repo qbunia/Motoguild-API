@@ -42,7 +42,7 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpGet("{id:int}", Name = "GetRoute")]
-        public IActionResult GetRoute(int id, [FromQuery] bool selectedData = false)
+        public IActionResult GetRoute(int id)
         {
             var route = _routeRepository.Get(id);
             if (route == null) return NotFound();
