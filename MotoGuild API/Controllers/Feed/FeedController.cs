@@ -12,7 +12,6 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/feeds")]
-    [EnableCors("AllowAnyOrigin")]
     public class FeedController : ControllerBase
     {
         private readonly IFeedRepository _feedRepository;

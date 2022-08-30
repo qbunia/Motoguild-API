@@ -9,7 +9,6 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    [EnableCors("AllowAnyOrigin")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;

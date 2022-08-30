@@ -10,7 +10,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/routes/{routeId:int}/posts")]
-[EnableCors("AllowAnyOrigin")]
 public class RoutePostsController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;

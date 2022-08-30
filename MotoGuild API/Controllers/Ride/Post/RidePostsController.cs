@@ -9,7 +9,6 @@ namespace MotoGuild_API.Controllers.Ride.Post
 {
     [ApiController]
     [Route("api/rides/{rideId:int}/posts")]
-    [EnableCors("AllowAnyOrigin")]
     public class RidePostsController : ControllerBase
     {
         private MotoGuildDbContext _db;

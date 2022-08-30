@@ -10,7 +10,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:int}/posts")]
-[EnableCors("AllowAnyOrigin")]
 public class GroupPostsController : ControllerBase
 {
     private readonly MotoGuildDbContext _db;

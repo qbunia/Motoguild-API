@@ -8,7 +8,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:int}/participants")]
-[EnableCors("AllowAnyOrigin")]
 public class GroupParticipantsController : ControllerBase
 {
     private readonly IGroupParticipantsRepository _groupParticipantsRepository;

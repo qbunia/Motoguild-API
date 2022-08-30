@@ -9,7 +9,6 @@ namespace MotoGuild_API.Controllers.Route
 {
     [ApiController]
     [Route("api/routes/{routeId:int}/stops")]
-    [EnableCors("AllowAnyOrigin")]
     public class RouteStopController : ControllerBase
     {
         private readonly IRouteStopsRepository _routeStopsRepository;

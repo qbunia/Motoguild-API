@@ -8,7 +8,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:int}/pendingusers")]
-[EnableCors("AllowAnyOrigin")]
 public class GroupPendingUsersController : ControllerBase
 {
     private readonly IGroupPendingUsersRepository _groupPendingUsersRepository;
