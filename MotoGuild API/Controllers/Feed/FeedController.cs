@@ -1,4 +1,5 @@
 ﻿
+using AutoMapper;
 using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
@@ -15,24 +16,24 @@ namespace MotoGuild_API.Controllers
     [EnableCors("AllowAnyOrigin")]
     public class FeedController : ControllerBase
     {
-        private MotoGuildDbContext _db;
+        private readonly IFeedRepository _feedRepository;
+        private readonly IMapper _mapper;
 
-        public FeedController(MotoGuildDbContext dbContext)
+        public FeedController(IFeedRepository feedRepository, IMapper mapper)
         {
-            _db = dbContext;
+            _feedRepository = feedRepository;
+            _mapper = mapper;
         }
 
         [HttpGet("{id:int}", Name = "GetFeed")]
         public IActionResult GetFeed(int id)
         {
-            var feed = _db.Feed.Include(f => f.Posts).ThenInclude(p => p.Author).FirstOrDefault(u => u.Id == id);
+            var feed = _feedRepository.Get(id);
             if (feed == null)
             {
                 return NotFound();
             }
-
-            var FeedDto = GetFeedDto(feed);
-            return Ok(FeedDto);
+            return Ok(_mapper.Map<FeedDto>(feed));
         }
 
         [HttpPost]
@@ -50,9 +51,10 @@ namespace MotoGuild_API.Controllers
                 Posts = new List<Post>()
             };
 
-            _db.Feed.Add(feed);
-            _db.SaveChanges();
-            return CreatedAtRoute("GetFeed", new { id = feed.Id }, feed);
+            _feedRepository.Insert(feed);
+            _feedRepository.Save();
+            var feedDto = _mapper.Map<FeedDto>(feed);
+            return CreatedAtRoute("GetFeed", new { id = feedDto.Id }, feedDto);
         }
 
         private FeedDto GetFeedDto(Feed feed)

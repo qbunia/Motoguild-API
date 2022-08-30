@@ -27,10 +27,13 @@ namespace MotoGuild_API.Helpers
             CreateMap<Post, PostDto>().ReverseMap();
             CreateMap<CreateRideDto, Ride>().ReverseMap();
             CreateMap<Stop, StopDto>().ReverseMap();
+            CreateMap<Stop, CreateStopDto>().ReverseMap();
+            CreateMap<Stop, UpdateStopDto>().ReverseMap();
             CreateMap<Domain.Route, FullRouteDto>().ReverseMap();
             CreateMap<CreateRouteDto, Domain.Route>().ReverseMap();
             CreateMap<UpdateRouteDto, Domain.Route>().ReverseMap();
             CreateMap<Comment, CommentDto>().ReverseMap();
+            CreateMap<FeedDto, Feed>().ReverseMap();
 
         }
     }
