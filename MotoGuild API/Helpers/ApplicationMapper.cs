@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain;
 using MotoGuild_API.Models.Comment;
+using MotoGuild_API.Models.Feed;
 using MotoGuild_API.Models.Group;
 using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.Ride;
@@ -30,6 +31,7 @@ namespace MotoGuild_API.Helpers
             CreateMap<Domain.Route, FullRouteDto>().ReverseMap();
             CreateMap<CreateRouteDto, Domain.Route>().ReverseMap();
             CreateMap<UpdateRouteDto, Domain.Route>().ReverseMap();
+            CreateMap<FeedDto, Feed>().ReverseMap();
 
         }
     }
