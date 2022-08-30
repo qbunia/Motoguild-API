@@ -1,158 +1,56 @@
-﻿using Data;
-using Domain;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Dto.PostDtos;
+using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers.Ride.Post
 {
     [ApiController]
-    [Route("api/rides/{rideId:int}/posts")]
+    [Route("api/rides/{rideId:int}/post")]
     [EnableCors("AllowAnyOrigin")]
     public class RidePostsController : ControllerBase
     {
-        private MotoGuildDbContext _db;
-
-        public RidePostsController(MotoGuildDbContext db)
+        private readonly IPostRepository _postRepository;
+        private readonly IMapper _mapper;
+        public RidePostsController(IPostRepository postRepositort, IMapper mapper)
         {
-            _db = db;
+            _postRepository = postRepositort;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult GetRidePosts(int rideId)
         {
-            var posts = _db.Rides.Include(r => r.Posts)
-                .Where(r => r.Id == rideId).Select(r => r.Posts).First().ToList();
-            var postsDto = GetRidePostsDtos(posts);
-            return Ok(postsDto);
+            var posts = _postRepository.GetAllRide(rideId);
+            return Ok(_mapper.Map<List<PostDto>>(posts));
         }
 
-        private List<PostDto> GetRidePostsDtos(List<Domain.Post> posts)
+        [HttpGet("postId:int", Name = "GetRidePost")]
+        public IActionResult GetRidePost(int postId)
         {
-            var postsDto = new List<PostDto>();
-            //foreach (var post in posts)
-            //{
-            //    var authorDto = new UserSelectedDataDto
-            //    {
-            //        Email = post.Author.Email,
-            //        Id = post.Author.Id,
-            //        Rating = post.Author.Rating,
-            //        UserName = post.Author.UserName
-            //    };
-
-
-            //    postsDto.Add(new PostDto
-            //    {
-            //        Author = authorDto,
-            //        Content = post.Content,
-            //        CreateTime = post.CreateTime,
-            //        Id = post.Id
-            //    });
-            //}
-            return postsDto;
-        }
-
-        [HttpGet("{id:int}", Name = "GetRidePost")]
-        public IActionResult GetRidePost(int rideId, int id)
-        {
-            var ride = _db.Rides
-                .Include(r => r.Posts)
-                .FirstOrDefault(r => r.Id == rideId);
-            if (ride == null)
-            {
-                return NotFound();
-            }
-            var post = _db.Posts
-                .Include(p => p.Author)
-                .FirstOrDefault(p => p.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            var postDto = GetRidePostDto(post);
-            return Ok(postDto);
-        }
-
-        private PostDto GetRidePostDto(Domain.Post post)
-        {
-            //var authorDto = new UserSelectedDataDto
-            //{
-            //    Email = post.Author.Email,
-            //    Id = post.Author.Id,
-            //    Rating = post.Author.Rating,
-            //    UserName = post.Author.UserName
-            //};
-
-            //var postDto = new PostDto
-            //{
-            //    Author = authorDto,
-            //    Content = post.Content,
-            //    CreateTime = post.CreateTime,
-            //    Id = post.Id
-            //};
-            return  new PostDto();
+            var post = _postRepository.Get(postId);
+            return Ok(_mapper.Map<List<PostDto>>(post));
         }
 
         [HttpPost]
         public IActionResult CreateRidePost(int rideId, [FromBody] CreatePostDto createPostDto)
         {
-            if (createPostDto == null)
-            {
-                return BadRequest();
-            }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var ride = _db.Rides.FirstOrDefault(r => r.Id == rideId);
-            if (ride == null)
-            {
-                return NotFound();
-            }
-            var user = _db.Users.FirstOrDefault(u => u.Id == createPostDto.Author.Id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            var post = SaveRideToDataBase(createPostDto, ride);
-            _db.Posts.Add(post);
-            _db.SaveChanges();
-            var postDto = GetRidePostDto(post);
-            return CreatedAtRoute("GetRidePost", new { rideId, id = post.Id }, postDto);
+            var post = _mapper.Map<Domain.Post>(createPostDto);
+            _postRepository.InsertToRide(post, rideId);
+            _postRepository.Save();
+            var postDto = _mapper.Map<PostDto>(post);
+            return CreatedAtRoute("GetRidePost", new { id = postDto.Id }, postDto);
         }
 
-        private Domain.Post SaveRideToDataBase(CreatePostDto createPostDto, Domain.Ride ride)
+        [HttpDelete("{postId:int}")]
+        public IActionResult DeleteRidePost(int postId)
         {
-            var author = _db.Users.FirstOrDefault(u => u.Id == createPostDto.Author.Id);
-            var post = new Domain.Post
-            {
-                Author = author,
-                Comments = new List<Domain.Comment>(),
-                Content = createPostDto.Content,
-                CreateTime = DateTime.Now
-            };
-            ride.Posts.Add(post);
-            _db.SaveChanges();
-            return post;
-        }
-
-        [HttpDelete("{id:int}")]
-        public IActionResult DeleteRidePost(int rideId, int id)
-        {
-            var ride = _db.Rides.FirstOrDefault(r => r.Id == rideId);
-            if (ride == null)
-            {
-                return NotFound();
-            }
-            var post = _db.Posts.FirstOrDefault(p => p.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            _db.Posts.Remove(post);
-            _db.SaveChanges();
-            return NoContent();
+            var post = _postRepository.Get(postId);
+            if (post == null) return NotFound();
+            _postRepository.Delete(postId);
+            _postRepository.Save();
+            return Ok();
         }
 
     }

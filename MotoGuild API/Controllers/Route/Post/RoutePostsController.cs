@@ -1,145 +1,58 @@
-﻿using Data;
+﻿using AutoMapper;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Dto.PostDtos;
-using MotoGuild_API.Dto.UserDtos;
+using MotoGuild_API.Repository.Interface;
 
-namespace MotoGuild_API.Controllers;
+namespace MotoGuild_API.Controllers
+{ 
 
-[ApiController]
-[Route("api/routes/{routeId:int}/posts")]
-[EnableCors("AllowAnyOrigin")]
-public class RoutePostsController : ControllerBase
-{
-    private readonly MotoGuildDbContext _db;
-
-    public RoutePostsController(MotoGuildDbContext dbContext)
+    [ApiController]
+    [Route("api/routes/{routeId:int}/posts")]
+    [EnableCors("AllowAnyOrigin")]
+    public class RoutePostsController : ControllerBase
     {
-        _db = dbContext;
-    }
-
-    [HttpGet]
-    public IActionResult GetRoutePosts(int routeId)
-    {
-        var route = _db.Routes
-            .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == routeId);
-        if (route == null) return NotFound();
-
-        var postsId = route.Posts.Select(p => p.Id);
-
-        var posts = _db.Posts
-            .Include(p => p.Author)
-            .Where(p => postsId.Contains(p.Id)).ToList();
-
-        if (posts == null) return NotFound();
-        var postsDto = GetRoutePostsDtos(posts);
-        return Ok(postsDto);
-    }
-
-    [HttpGet("{id:int}", Name = "GetRoutePost")]
-    public IActionResult GetRoutePost(int routeId, int id)
-    {
-        var route = _db.Routes
-            .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == routeId);
-        if (route == null) return NotFound();
-        var post = _db.Posts
-            .Include(p => p.Author)
-            .FirstOrDefault(p => p.Id == id);
-
-        if (post == null) return NotFound();
-
-        var postDto = GetRoutePostDto(post);
-        return Ok(postDto);
-    }
-
-    [HttpPost]
-    public IActionResult CreateGroupPost(int routeId, [FromBody] CreatePostDto createPostDto)
-    {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var route = _db.Routes.Include(g => g.Posts).FirstOrDefault(g => g.Id == routeId);
-        if (route == null) return NotFound();
-        var post = SaveRoutePostToDataBase(createPostDto, route);
-        var postDto = GetRoutePostDto(post);
-        return CreatedAtRoute("GetRoutePost", new { routeId, id = postDto.Id }, postDto);
-    }
-
-    private Post SaveRoutePostToDataBase(CreatePostDto createUserDto, Domain.Route route)
-    {
-        var author = _db.Users.FirstOrDefault(u => u.Id == createUserDto.Author.Id);
-        var post = new Post
+        private readonly IPostRepository _postRepository;
+        private readonly IMapper _mapper;
+        public RoutePostsController(IPostRepository postRepositort, IMapper mapper)
         {
-            Author = author,
-            Comments = new List<Domain.Comment>(),
-            Content = createUserDto.Content,
-            CreateTime = DateTime.Now
-        };
-        route.Posts.Add(post);
-        _db.SaveChanges();
-        return post;
-    }
-
-
-    [HttpDelete("{id:int}")]
-    public IActionResult DeleteGroupPost(int routeId, int id)
-    {
-        var route = _db.Routes.Include(g => g.Posts).FirstOrDefault(u => u.Id == routeId);
-        if (route == null) return NotFound();
-
-        var post = _db.Posts.FirstOrDefault(p => p.Id == id);
-        if (!route.Posts.Contains(post)) return NotFound();
-
-        _db.Posts.Remove(post);
-        _db.SaveChanges();
-        return Ok();
-    }
-
-
-    private List<PostDto> GetRoutePostsDtos(List<Post> posts)
-    {
-        var postsDtos = new List<PostDto>();
-        foreach (var post in posts)
-        {
-            var authorDto = new UserDto
-            {
-                Email = post.Author.Email,
-                Id = post.Author.Id,
-                Rating = post.Author.Rating,
-                UserName = post.Author.UserName
-            };
-
-            postsDtos.Add(new PostDto
-            {
-                Author = authorDto,
-                Content = post.Content,
-                CreateTime = post.CreateTime,
-                Id = post.Id
-            });
+            _postRepository = postRepositort;
+            _mapper = mapper;
         }
 
-        return postsDtos;
-    }
-
-    private PostDto GetRoutePostDto(Post post)
-    {
-        var authorDto = new UserDto
+        [HttpGet]
+        public IActionResult GetRoutePosts(int routeId)
         {
-            Email = post.Author.Email,
-            Id = post.Author.Id,
-            Rating = post.Author.Rating,
-            UserName = post.Author.UserName
-        };
+            var posts = _postRepository.GetAllRoute(routeId);
+            return Ok(_mapper.Map<List<PostDto>>(posts));
+        }
 
-        var postDto = new PostDto
+        [HttpGet("postId:int", Name = "GetRoutePost")]
+        public IActionResult GetRoutePost(int postId)
         {
-            Author = authorDto,
-            Content = post.Content,
-            CreateTime = post.CreateTime,
-            Id = post.Id
-        };
-        return postDto;
+            var post = _postRepository.Get(postId);
+            return Ok(_mapper.Map<List<PostDto>>(post));
+        }
+
+        [HttpPost]
+        public IActionResult CreateRoutePost(int routeId, [FromBody] CreatePostDto createPostDto)
+        {
+            var post = _mapper.Map<Post>(createPostDto);
+            _postRepository.InsertToRoute(post,routeId);
+            _postRepository.Save();
+            var postDto = _mapper.Map<PostDto>(post);
+            return CreatedAtRoute("GetRoutePost", new { id = postDto.Id }, postDto);
+        }
+
+        [HttpDelete("{postId:int}")]
+        public IActionResult DeleteRoutePost(int postId)
+        {
+            var post = _postRepository.Get(postId);
+            if (post == null) return NotFound();
+            _postRepository.Delete(postId);
+            _postRepository.Save();
+            return Ok();
+        }
     }
 }
