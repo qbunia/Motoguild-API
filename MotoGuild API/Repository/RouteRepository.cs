@@ -1,6 +1,7 @@
 ﻿using Data;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 using Route = Domain.Route;
 
@@ -14,21 +15,28 @@ namespace MotoGuild_API.Repository
         {
             _context = context;
         }
-
-        public IEnumerable<Route> GetAll()
+        public IEnumerable<Route> GetAll(PaginationParams @params)
         {
             return _context.Routes
                 .Include(r => r.Owner)
                 .Include(r=>r.Stops)
+                .Skip((@params.Page - 1) * @params.ItemsPerPage)
+                .Take(@params.ItemsPerPage)
                 .ToList();
         }
-        public IEnumerable<Route> GetFiveOrderByRating()
+
+        public int TotalNumberOfRoutes()
+        {
+            return _context.Routes.Count(); ;
+        }
+        public IEnumerable<Route> GetFiveOrderByRating(PaginationParams @params)
         {
             return _context.Routes
                 .Include(r => r.Owner)
                 .Include(r => r.Stops)
                 .OrderByDescending(r=>r.Rating)
-                .Take(5)
+                .Skip((@params.Page - 1) * @params.ItemsPerPage)
+                .Take(@params.ItemsPerPage)
                 .ToList();
         }
 
