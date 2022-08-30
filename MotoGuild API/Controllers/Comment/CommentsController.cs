@@ -8,7 +8,6 @@ namespace MotoGuild_API.Controllers.Comment
 {
     [ApiController]
     [Route("api/post/{postId:int}/comment")]
-    [EnableCors("AllowAnyOrigin")]
 
     public class CommentsController : ControllerBase
     {

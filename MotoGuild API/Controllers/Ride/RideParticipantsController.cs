@@ -8,7 +8,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/rides/{rideId:int}/participants")]
-[EnableCors("AllowAnyOrigin")]
 public class RideParticipantsController : ControllerBase
 {
     private readonly IRideParticipantsRepository _rideParticipantsRepository;

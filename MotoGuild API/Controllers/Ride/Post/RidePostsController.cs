@@ -7,8 +7,7 @@ using MotoGuild_API.Repository.Interface;
 namespace MotoGuild_API.Controllers.Ride.Post
 {
     [ApiController]
-    [Route("api/rides/{rideId:int}/post")]
-    [EnableCors("AllowAnyOrigin")]
+    [Route("api/rides/{rideId:int}/posts")]
     public class RidePostsController : ControllerBase
     {
         private readonly IPostRepository _postRepository;

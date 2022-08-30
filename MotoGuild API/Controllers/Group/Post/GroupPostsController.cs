@@ -11,8 +11,7 @@ using MotoGuild_API.Repository.Interface;
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
-[Route("api/groups/{groupId:int}/post")]
-[EnableCors("AllowAnyOrigin")]
+[Route("api/groups/{groupId:int}/posts")]
 public class GroupPostsController : ControllerBase
 {
     private readonly IPostRepository _postRepository;

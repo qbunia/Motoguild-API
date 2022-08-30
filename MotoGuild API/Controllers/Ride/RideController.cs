@@ -8,7 +8,6 @@ namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/rides")]
-[EnableCors("AllowAnyOrigin")]
 
 public class RideController : ControllerBase
 {

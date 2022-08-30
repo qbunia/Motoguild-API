@@ -8,18 +8,16 @@ using MotoGuild_API.Repository.Interface;
 namespace MotoGuild_API.Controllers
 { 
 
-    [ApiController]
-    [Route("api/routes/{routeId:int}/posts")]
-    [EnableCors("AllowAnyOrigin")]
-    public class RoutePostsController : ControllerBase
+[ApiController]
+[Route("api/routes/{routeId:int}/posts")]
+public class RoutePostsController : ControllerBase
+{
+    private readonly MotoGuildDbContext _db;
+
+    public RoutePostsController(MotoGuildDbContext dbContext)
     {
-        private readonly IPostRepository _postRepository;
-        private readonly IMapper _mapper;
-        public RoutePostsController(IPostRepository postRepositort, IMapper mapper)
-        {
-            _postRepository = postRepositort;
-            _mapper = mapper;
-        }
+        _db = dbContext;
+    }
 
         [HttpGet]
         public IActionResult GetRoutePosts(int routeId)
