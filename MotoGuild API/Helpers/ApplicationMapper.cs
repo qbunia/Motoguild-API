@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using MotoGuild_API.Models.Comment;
 using MotoGuild_API.Models.Group;
 using MotoGuild_API.Models.Post;
 using MotoGuild_API.Models.Ride;
@@ -19,8 +20,8 @@ namespace MotoGuild_API.Helpers
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Ride, RideDto>().ReverseMap();
             CreateMap<Domain.Route, RouteDto>().ReverseMap();
-            CreateMap<Post, PostDto>();
-            CreateMap<CreateRideDto, Ride>();
+            CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<CreateRideDto, Ride>().ReverseMap();
             CreateMap<CreateUserDto, User>().ReverseMap();
             CreateMap<UpdateUserDto, User>().ReverseMap();
             CreateMap<Post, PostDto>().ReverseMap();

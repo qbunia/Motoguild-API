@@ -31,7 +31,7 @@ public class GroupParticipantsController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(_mapper.Map<UserDto>(participants));
+        return Ok(_mapper.Map<List<UserDto>>(participants));
     }
 
     [HttpGet("{id:int}", Name = "GetGroupParticipant")]
@@ -53,15 +53,15 @@ public class GroupParticipantsController : ControllerBase
             return NotFound();
         }
 
-        if (!_groupParticipantsRepository.UserInGroup(groupId, id))
+        if (_groupParticipantsRepository.UserInGroup(groupId, id))
         {
-            return NotFound();
+            return BadRequest();
         }
         _groupParticipantsRepository.AddParticipantByUserId(groupId, id);
         _groupParticipantsRepository.Save();
         var user = _groupParticipantsRepository.GetUser(id);
         var userDto = _mapper.Map<UserDto>(user);
-        return CreatedAtRoute("GetGroupParticipant", new { id = userDto.Id }, userDto);
+        return CreatedAtRoute("GetGroupParticipant", new { id = userDto.Id, groupId = groupId }, userDto);
     }
 
 
