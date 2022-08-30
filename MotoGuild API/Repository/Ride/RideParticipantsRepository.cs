@@ -76,7 +76,7 @@ namespace MotoGuild_API.Repository
 
         public bool UserInRide(int rideId, int userId)
         {
-            var ride = _context.Groups.Include(g => g.Participants).FirstOrDefault(g => g.Id == rideId);
+            var ride = _context.Rides.Include(g => g.Participants).FirstOrDefault(g => g.Id == rideId);
             if (ride != null)
             {
                 var participantsIds = ride.Participants.Select(p => p.Id);
