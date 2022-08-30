@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using Data;
-using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.Route;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.RouteDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers.Route
@@ -38,7 +34,7 @@ namespace MotoGuild_API.Controllers.Route
                 var selectedRoutes = _routeRepository.GetFiveOrderByRating();
                 return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
             }
-            
+
         }
 
         [HttpGet("{id:int}", Name = "GetRoute")]

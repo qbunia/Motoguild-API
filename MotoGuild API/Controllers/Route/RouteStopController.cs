@@ -1,12 +1,9 @@
-﻿using System.Linq;
-using Data;
+﻿using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.Route;
-using MotoGuild_API.Models.Stops;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.StopDtos;
 
 namespace MotoGuild_API.Controllers.Route
 {
@@ -42,7 +39,7 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpGet("{id:int}", Name = "GetRouteStop")]
-        public IActionResult GetRouteStop(int routeId,int id, [FromQuery] bool selectedData = false)
+        public IActionResult GetRouteStop(int routeId, int id, [FromQuery] bool selectedData = false)
         {
             var route = _db.Routes
                 .Include(r => r.Stops)
@@ -64,7 +61,7 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpPost]
-        public IActionResult CreateRouteStop(int routeId,[FromBody] CreateStopDto createStopDto)
+        public IActionResult CreateRouteStop(int routeId, [FromBody] CreateStopDto createStopDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -79,11 +76,11 @@ namespace MotoGuild_API.Controllers.Route
 
             var stop = SaveRouteToDataBase(createStopDto, route);
             var stopDto = GetRouteStopDto(stop);
-            return CreatedAtRoute("GetRouteStop", new { id = stopDto.Id, routeId =  routeId}, stopDto);
+            return CreatedAtRoute("GetRouteStop", new { id = stopDto.Id, routeId = routeId }, stopDto);
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteRouteStop(int routeId,int id)
+        public IActionResult DeleteRouteStop(int routeId, int id)
         {
             var route = _db.Routes
                 .Include(r => r.Stops)
@@ -106,7 +103,7 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult UpdateRouteStop(int routeId,int id, [FromBody] UpdateStopDto updateStopDto)
+        public IActionResult UpdateRouteStop(int routeId, int id, [FromBody] UpdateStopDto updateStopDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var route = _db.Routes
@@ -178,7 +175,7 @@ namespace MotoGuild_API.Controllers.Route
                 Name = stop.Name,
                 Place = stop.Place
             };
-            
+
 
             return stopDto;
         }

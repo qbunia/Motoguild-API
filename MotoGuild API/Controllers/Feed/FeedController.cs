@@ -2,12 +2,11 @@
 using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.Feed;
-using MotoGuild_API.Models.Post;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.FeedDtos;
+using MotoGuild_API.Dto.PostDtos;
+using MotoGuild_API.Dto.UserDtos;
 
 namespace MotoGuild_API.Controllers
 {
@@ -78,7 +77,7 @@ namespace MotoGuild_API.Controllers
                 });
             }
             var feedDto = new FeedDto()
-                {Id = feed.Id, Posts = postsDtos };
+            { Id = feed.Id, Posts = postsDtos };
             return feedDto;
         }
     }

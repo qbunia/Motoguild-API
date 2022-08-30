@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Domain;
-using MotoGuild_API.Models.Comment;
-using MotoGuild_API.Models.Group;
-using MotoGuild_API.Models.Post;
-using MotoGuild_API.Models.Ride;
-using MotoGuild_API.Models.Route;
-using MotoGuild_API.Models.Stops;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.CommentDtos;
+using MotoGuild_API.Dto.GroupDtos;
+using MotoGuild_API.Dto.PostDtos;
+using MotoGuild_API.Dto.RideDtos;
+using MotoGuild_API.Dto.RouteDtos;
+using MotoGuild_API.Dto.StopDtos;
+using MotoGuild_API.Dto.UserDtos;
 
 namespace MotoGuild_API.Helpers
 {
@@ -20,8 +20,8 @@ namespace MotoGuild_API.Helpers
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Ride, RideDto>().ReverseMap();
             CreateMap<Domain.Route, RouteDto>().ReverseMap();
-            CreateMap<Post, PostDto>();
-            CreateMap<CreateRideDto, Ride>();
+            CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<CreateRideDto, Ride>().ReverseMap();
             CreateMap<CreateUserDto, User>().ReverseMap();
             CreateMap<UpdateUserDto, User>().ReverseMap();
             CreateMap<Post, PostDto>().ReverseMap();
@@ -30,6 +30,7 @@ namespace MotoGuild_API.Helpers
             CreateMap<Domain.Route, FullRouteDto>().ReverseMap();
             CreateMap<CreateRouteDto, Domain.Route>().ReverseMap();
             CreateMap<UpdateRouteDto, Domain.Route>().ReverseMap();
+            CreateMap<Comment, CommentDto>().ReverseMap();
 
         }
     }

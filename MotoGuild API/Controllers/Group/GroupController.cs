@@ -2,7 +2,7 @@
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using MotoGuild_API.Models.Group;
+using MotoGuild_API.Dto.GroupDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
