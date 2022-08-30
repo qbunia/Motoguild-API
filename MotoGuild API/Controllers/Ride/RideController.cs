@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using MotoGuild_API.Models.Ride;
+using MotoGuild_API.Dto.RideDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
@@ -29,10 +28,10 @@ public class RideController : ControllerBase
         return Ok(_mapper.Map<List<RideDto>>(rides));
     }
 
-    [HttpGet("{id:int}", Name = "GetRide")]
-    public IActionResult GetRide(int id, [FromQuery] bool selectedData = false)
+    [HttpGet("{rideId:int}", Name = "GetRide")]
+    public IActionResult GetRide(int rideId)
     {
-        var ride = _rideRepository.Get(id);
+        var ride = _rideRepository.Get(rideId);
         if (ride == null) return NotFound();
         return Ok(_mapper.Map<RideDto>(ride));
     }

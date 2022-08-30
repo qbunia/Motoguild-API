@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
-using Data;
-using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Helpers;
-using MotoGuild_API.Models.Route;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.RouteDtos;
 using MotoGuild_API.Repository.Interface;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -43,7 +38,7 @@ namespace MotoGuild_API.Controllers.Route
                 var selectedRoutes = _routeRepository.GetFiveOrderByRating(@params);
                 return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
             }
-            
+
         }
 
         [HttpGet("{id:int}", Name = "GetRoute")]

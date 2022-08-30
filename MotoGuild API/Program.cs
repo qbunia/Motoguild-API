@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IFeedRepository, FeedRepository>();
 builder.Services.AddScoped<IGroupParticipantsRepository, GroupParticipantsRepository>();
 builder.Services.AddScoped<IGroupPendingUsersRepository, GroupPendingUsersRepository>();
 builder.Services.AddScoped<IRideParticipantsRepository, RideParticipantsRepository>();

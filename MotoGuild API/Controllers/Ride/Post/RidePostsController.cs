@@ -3,8 +3,7 @@ using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.Post;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.PostDtos;
 
 namespace MotoGuild_API.Controllers.Ride.Post
 {
