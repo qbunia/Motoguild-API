@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.RideDtos;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
@@ -21,9 +23,12 @@ public class RideController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetRides()
+    public IActionResult GetRides([FromQuery] PaginationParams @params)
     {
-        var rides = _rideRepository.GetAll();
+        var paginationMetadata = new PaginationMetadata(_rideRepository.TotalNumberOfRides(), @params.Page,
+            @params.ItemsPerPage);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+        var rides = _rideRepository.GetAll(@params);
         return Ok(_mapper.Map<List<RideDto>>(rides));
     }
 
@@ -36,13 +41,13 @@ public class RideController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateRide([FromBody] CreateRideDto createRideDto)
+    public IActionResult CreateRide([FromBody] CreateRideDto createRideDto, int rideId)
     {
         var ride = _mapper.Map<Domain.Ride>(createRideDto);
         _rideRepository.Insert(ride);
         _rideRepository.Save();
         var rideDto = _mapper.Map<RideDto>(ride);
-        return CreatedAtRoute("GetRide", new { id = rideDto.Id }, rideDto);
+        return CreatedAtRoute("GetRide", new { id = rideDto.Id, rideId=rideId }, rideDto);
     }
 
     [HttpDelete("{id:int}")]

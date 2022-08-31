@@ -1,6 +1,7 @@
 ﻿using Data;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Repository
@@ -14,19 +15,35 @@ namespace MotoGuild_API.Repository
             _context = context;
         }
 
-        public IEnumerable<Ride> GetAll()
+        public IEnumerable<Ride> GetAll(PaginationParams @params)
         {
             return _context.Rides
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
                 .Include(g => g.Posts)
                 .ThenInclude(p => p.Author)
+                .Include(r=>r.Route).ThenInclude(i=>i.Owner)
+                .Include(r=>r.Route).ThenInclude(i=>i.Stops)
+                .Skip((@params.Page - 1) * @params.ItemsPerPage)
+                .Take(@params.ItemsPerPage)
                 .ToList();
+        }
+
+        public int TotalNumberOfRides()
+        {
+            return _context.Routes.Count();
         }
         
         public Ride Get(int id)
         {
-            return _context.Rides.Find(id);
+            return _context.Rides
+                .Include(g => g.Owner)
+                .Include(g => g.Participants)
+                .Include(g => g.Posts)
+                .ThenInclude(p => p.Author)
+                .Include(r => r.Route).ThenInclude(i => i.Owner)
+                .Include(r => r.Route).ThenInclude(i => i.Stops)
+                .FirstOrDefault(r => r.Id == id);
         }
 
         public void Insert(Ride ride)

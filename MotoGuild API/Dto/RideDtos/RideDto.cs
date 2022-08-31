@@ -17,7 +17,7 @@ namespace MotoGuild_API.Dto.RideDtos
         public int Estimation { get; set; }
         public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
         public int MinimumRating { get; set; }
-        public string Owner { get; set; }
+        public UserDto Owner { get; set; }
 
     }
 }
