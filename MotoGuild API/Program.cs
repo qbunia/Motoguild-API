@@ -35,6 +35,7 @@ builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IRouteStopsRepository, RouteStopsRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 
 var app = builder.Build();
 

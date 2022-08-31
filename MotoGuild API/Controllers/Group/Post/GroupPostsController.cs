@@ -1,10 +1,12 @@
-﻿using Data;
+﻿using AutoMapper;
+using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Dto.PostDtos;
 using MotoGuild_API.Dto.UserDtos;
+using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
 
@@ -12,144 +14,46 @@ namespace MotoGuild_API.Controllers;
 [Route("api/groups/{groupId:int}/posts")]
 public class GroupPostsController : ControllerBase
 {
-    private readonly MotoGuildDbContext _db;
+    private readonly IPostRepository _postRepository;
+    private readonly IMapper _mapper;
 
-    public GroupPostsController(MotoGuildDbContext dbContext)
+    public GroupPostsController(IPostRepository postRepositort, IMapper mapper)
     {
-        _db = dbContext;
+        _postRepository = postRepositort;
+        _mapper = mapper;
     }
 
     [HttpGet]
-    public IActionResult GetGroupPosts(int groupId, [FromQuery] bool orderByDate = false)
+    public IActionResult GetGroupPosts(int feedId)
     {
-        var group = _db.Groups
-            .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-
-        var postsId = group.Posts.Select(p => p.Id);
-        var posts = new List<Post>();
-
-        if (orderByDate)
-        {
-            posts = _db.Posts
-                .Include(p => p.Author)
-                .Where(p => postsId.Contains(p.Id)).OrderByDescending(p => p.CreateTime).ToList();
-        }
-        else
-        {
-            posts = _db.Posts
-                .Include(p => p.Author)
-                .Where(p => postsId.Contains(p.Id)).ToList();
-        }
-
-
-        if (posts == null) return NotFound();
-        var postsDto = GetGroupPostsDtos(posts);
-        return Ok(postsDto);
+        var posts = _postRepository.GetAllGroup(feedId);
+        return Ok(_mapper.Map<List<PostDto>>(posts));
     }
 
-    [HttpGet("{id:int}", Name = "GetGroupPost")]
-    public IActionResult GetGroupPost(int groupId, int id)
+    [HttpGet("postId:int", Name = "GetGroupPost")]
+    public IActionResult GetGroupPost(int postId)
     {
-        var group = _db.Groups
-            .Include(g => g.Posts)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-        var post = _db.Posts
-            .Include(p => p.Author)
-            .FirstOrDefault(p => p.Id == id);
-
-        if (post == null) return NotFound();
-
-        var postDto = GetGroupPostDto(post);
-        return Ok(postDto);
+        var post = _postRepository.Get(postId);
+        return Ok(_mapper.Map<List<PostDto>>(post));
     }
 
     [HttpPost]
     public IActionResult CreateGroupPost(int groupId, [FromBody] CreatePostDto createPostDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-        var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-        var post = SaveGroupPostToDataBase(createPostDto, group);
-        var postDto = GetGroupPostDto(post);
-        return CreatedAtRoute("GetGroupPost", new {groupId, id = postDto.Id}, postDto);
+        var post = _mapper.Map<Post>(createPostDto);
+        _postRepository.InsertToGroup(post, groupId);
+        _postRepository.Save();
+        var postDto = _mapper.Map<PostDto>(post);
+        return CreatedAtRoute("GetGroupPost", new { id = postDto.Id }, postDto);
     }
 
-    private Post SaveGroupPostToDataBase(CreatePostDto createUserDto, Group group)
+    [HttpDelete("{postId:int}")]
+    public IActionResult DeleteGroupPost(int postId)
     {
-        var author = _db.Users.FirstOrDefault(u => u.Id == createUserDto.Author.Id);
-        var post = new Post
-        {
-            Author = author,
-            Comments = new List<Domain.Comment>(),
-            Content = createUserDto.Content,
-            CreateTime = DateTime.Now
-        };
-        group.Posts.Add(post);
-        _db.SaveChanges();
-        return post;
-    }
-
-
-    [HttpDelete("{id:int}")]
-    public IActionResult DeleteGroupPost(int groupId, int id)
-    {
-        var group = _db.Groups.Include(g => g.Posts).FirstOrDefault(u => u.Id == groupId);
-        if (group == null) return NotFound();
-
-        var post = _db.Posts.FirstOrDefault(p => p.Id == id);
-        if (!group.Posts.Contains(post)) return NotFound();
-
-        _db.Posts.Remove(post);
-        _db.SaveChanges();
+        var post = _postRepository.Get(postId);
+        if (post == null) return NotFound();
+        _postRepository.Delete(postId);
+        _postRepository.Save();
         return Ok();
-    }
-
-
-    private List<PostDto> GetGroupPostsDtos(List<Post> posts)
-    {
-        var postsDtos = new List<PostDto>();
-        foreach (var post in posts)
-        {
-            var authorDto = new UserDto
-            {
-                Email = post.Author.Email,
-                Id = post.Author.Id,
-                Rating = post.Author.Rating,
-                UserName = post.Author.UserName
-            };
-
-            postsDtos.Add(new PostDto
-            {
-                Author = authorDto,
-                Content = post.Content,
-                CreateTime = post.CreateTime,
-                Id = post.Id
-            });
-        }
-
-        return postsDtos;
-    }
-
-    private PostDto GetGroupPostDto(Post post)
-    {
-        var authorDto = new UserDto
-        {
-            Email = post.Author.Email,
-            Id = post.Author.Id,
-            Rating = post.Author.Rating,
-            UserName = post.Author.UserName
-        };
-
-        var postDto = new PostDto
-        {
-            Author = authorDto,
-            Content = post.Content,
-            CreateTime = post.CreateTime,
-            Id = post.Id
-        };
-        return postDto;
     }
 }
