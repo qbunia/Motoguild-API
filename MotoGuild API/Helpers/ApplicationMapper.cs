@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain;
 using MotoGuild_API.Dto.CommentDtos;
+using MotoGuild_API.Dto.EventDtos;
 using MotoGuild_API.Dto.FeedDtos;
 using MotoGuild_API.Dto.GroupDtos;
 using MotoGuild_API.Dto.PostDtos;
@@ -33,6 +34,10 @@ namespace MotoGuild_API.Helpers
             CreateMap<Domain.Route, FullRouteDto>().ReverseMap();
             CreateMap<CreateRouteDto, Domain.Route>().ReverseMap();
             CreateMap<UpdateRouteDto, Domain.Route>().ReverseMap();
+            CreateMap<CreateEventDto, Event>().ReverseMap();
+            CreateMap<Event, EventDto>().ReverseMap();
+            CreateMap<UpdateEventDto, Event>().ReverseMap();
+
             CreateMap<Comment, CommentDto>().ReverseMap();
             CreateMap<FeedDto, Feed>().ReverseMap();
         }

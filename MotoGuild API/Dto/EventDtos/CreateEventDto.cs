@@ -9,7 +9,7 @@ namespace MotoGuild_API.Dto.EventDtos
         [Required]
         public string Name { get; set; }
         [Required]
-        public int OwnerId { get; set; }
+        public UserDto Owner { get; set; }
         [Required]
         public string Description { get; set; } = String.Empty;
         public ICollection<UserDtos.UserDto>? Participants { get; set; } = new List<UserDtos.UserDto>();
