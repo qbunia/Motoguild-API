@@ -22,8 +22,13 @@ namespace MotoGuild_API.Controllers
         public IActionResult GetPostsFeed(int feedId)
         {
             var posts = _postRepository.GetAllFeed(feedId);
+
+            if (posts == null) return NotFound();
+
             return Ok(_mapper.Map<List<PostDto>>(posts));
+          
         }
+
 
         [HttpGet("{postId:int}", Name = "GetFeedPost")]
         public IActionResult GetPostFeed(int postId)

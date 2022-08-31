@@ -9,6 +9,7 @@ namespace MotoGuild_API.Repository.Interface
         IEnumerable<Post>? GetAllGroup(int groupId);
         IEnumerable<Post>? GetAllRide(int rideId);
         IEnumerable<Post>? GetAllRoute(int routeId);
+        IEnumerable<Post>? OrderedPost(IEnumerable<Post> posts);
         Post? Get(int postId);
         void InsertToFeed(Post post, int feedId);
         void InsertToGroup(Post post, int groupId);

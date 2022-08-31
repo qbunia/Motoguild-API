@@ -57,7 +57,7 @@ namespace MotoGuild_API.Repository
 
         public IEnumerable<Post>? GetAllFeed(int feedId)
         {
-            var posts = _context.Feed.Include(f =>f.Posts).ThenInclude(p => p.Author).FirstOrDefault(f => f.Id == feedId).Posts;
+            var posts = _context.Feed.Include(f =>f.Posts).ThenInclude(p => p.Author).FirstOrDefault(f => f.Id == feedId).Posts.OrderByDescending(p => p.CreateTime).ToList();
             return posts != null ? posts : Enumerable.Empty<Post>();
 
         }
@@ -65,19 +65,19 @@ namespace MotoGuild_API.Repository
         public IEnumerable<Post>? GetAllGroup(int groupId)
         {
 
-            var posts = _context.Groups.Include(g => g.Posts).ThenInclude(p => p.Author).FirstOrDefault(g => g.Id == groupId).Posts;
+            var posts = _context.Groups.Include(g => g.Posts).ThenInclude(p => p.Author).FirstOrDefault(g => g.Id == groupId).Posts.OrderByDescending(p => p.CreateTime).ToList();
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
         public IEnumerable<Post>? GetAllRide(int rideId)
         {
-            var posts = _context.Rides.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == rideId).Posts;
+            var posts = _context.Rides.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == rideId).Posts.OrderByDescending(p => p.CreateTime).ToList();
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
         public IEnumerable<Post>? GetAllRoute(int routeId)
         {
-            var posts = _context.Routes.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == routeId).Posts;
+            var posts = _context.Routes.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == routeId).Posts.OrderByDescending(p => p.CreateTime).ToList();
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
@@ -115,6 +115,11 @@ namespace MotoGuild_API.Repository
         public void Update(Post post)
         {
             _context.Entry(post).State = EntityState.Modified;
+        }
+
+        public IEnumerable<Post>? OrderedPost(IEnumerable<Post> posts)
+        {
+            return posts.OrderByDescending(post => post.CreateTime);
         }
     }
 }
