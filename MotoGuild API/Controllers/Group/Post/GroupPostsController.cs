@@ -38,7 +38,7 @@ public class GroupPostsController : ControllerBase
     public IActionResult CreateGroupPost(int groupId, [FromBody] CreatePostDto createPostDto)
     {
         createPostDto.CreateTime = DateTime.Now;
-        var post = _mapper.Map<Post>(createPostDto);
+        var post = _mapper.Map<Domain.Post>(createPostDto);
         _postRepository.InsertToGroup(post, groupId);
         _postRepository.Save();
         var postDto = _mapper.Map<PostDto>(post);

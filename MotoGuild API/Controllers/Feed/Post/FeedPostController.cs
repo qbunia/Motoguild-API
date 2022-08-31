@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Domain;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.PostDtos;
 using MotoGuild_API.Repository.Interface;
@@ -39,7 +37,7 @@ namespace MotoGuild_API.Controllers
         public IActionResult CreateFeedPost(int feedId, [FromBody] CreatePostDto createPostDto)
         {
             createPostDto.CreateTime = DateTime.Now;
-            var post = _mapper.Map<Post>(createPostDto);
+            var post = _mapper.Map<Domain.Post>(createPostDto);
             _postRepository.InsertToFeed(post, feedId);
             _postRepository.Save();
             var postDto = _mapper.Map<PostDto>(post);

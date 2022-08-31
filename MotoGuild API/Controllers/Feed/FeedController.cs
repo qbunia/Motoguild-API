@@ -46,7 +46,7 @@ namespace MotoGuild_API.Controllers
 
             var feed = new Feed()
             {
-                Posts = new List<Post>()
+                Posts = new List<Domain.Post>()
             };
 
             _feedRepository.Insert(feed);
