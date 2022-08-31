@@ -50,7 +50,7 @@ namespace MotoGuild_API.Repository
         {
             var ownerFull = _context.Users.FirstOrDefault(u => u.Id == ride.Owner.Id);
             ride.Owner = ownerFull;
-            var routeFull = _context.Routes.FirstOrDefault(r => r.Id == ride.Route.Id);
+            var routeFull = _context.Routes.Include(r => r.Owner).FirstOrDefault(r => r.Id == ride.Route.Id);
             ride.Route = routeFull; 
             _context.Rides.Add(ride);
             ride.Participants.Add(ride.Owner);
