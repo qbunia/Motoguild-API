@@ -7,21 +7,19 @@ using MotoGuild_API.Dto.PostDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers
-{ 
-
-[ApiController]
-[Route("api/routes/{routeId:int}/posts")]
-public class RoutePostsController : ControllerBase
 {
-        private readonly MotoGuildDbContext _db;
-        private readonly IMapper _mapper;
-        private readonly IPostRepository _postRepository;
 
-
-        public RoutePostsController(MotoGuildDbContext dbContext)
+    [ApiController]
+    [Route("api/route/{routeId:int}/post")]
+    public class RoutePostsController : ControllerBase
     {
-        _db = dbContext;
-    }
+        private readonly IPostRepository _postRepository;
+        private readonly IMapper _mapper;
+        public RoutePostsController(IPostRepository postRepositort, IMapper mapper)
+        {
+            _postRepository = postRepositort;
+            _mapper = mapper;
+        }
 
         [HttpGet]
         public IActionResult GetRoutePosts(int routeId)
@@ -30,21 +28,22 @@ public class RoutePostsController : ControllerBase
             return Ok(_mapper.Map<List<PostDto>>(posts));
         }
 
-        [HttpGet("postId:int", Name = "GetRoutePost")]
+        [HttpGet("{postId:int}", Name = "GetRoutePost")]
         public IActionResult GetRoutePost(int postId)
         {
             var post = _postRepository.Get(postId);
-            return Ok(_mapper.Map<List<PostDto>>(post));
+            return Ok(_mapper.Map<PostDto>(post));
         }
 
         [HttpPost]
         public IActionResult CreateRoutePost(int routeId, [FromBody] CreatePostDto createPostDto)
         {
+            createPostDto.CreateTime = DateTime.Now;
             var post = _mapper.Map<Post>(createPostDto);
-            _postRepository.InsertToRoute(post,routeId);
+            _postRepository.InsertToRoute(post, routeId);
             _postRepository.Save();
             var postDto = _mapper.Map<PostDto>(post);
-            return CreatedAtRoute("GetRoutePost", new { id = postDto.Id }, postDto);
+            return CreatedAtRoute("GetRoutePost", new { routeId = routeId, postId = postDto.Id }, postDto);
         }
 
         [HttpDelete("{postId:int}")]
@@ -57,4 +56,5 @@ public class RoutePostsController : ControllerBase
             return Ok();
         }
     }
+
 }

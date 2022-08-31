@@ -12,7 +12,7 @@ namespace MotoGuild_API.Dto.EventDtos
         public UserDto Owner { get; set; }
         [Required]
         public string Description { get; set; } = String.Empty;
-        public ICollection<UserDto>? Participants { get; set; } = new List<UserDto>();
+        public ICollection<UserDtos.UserDto>? Participants { get; set; } = new List<UserDtos.UserDto>();
         [Required]
         public string Place { get; set; }
         [Required]
