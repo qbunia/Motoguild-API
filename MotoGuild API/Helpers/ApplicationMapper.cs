@@ -18,7 +18,7 @@ namespace MotoGuild_API.Helpers
             CreateMap<Group, SelectedGroupDto>().ReverseMap();
             CreateMap<CreateGroupDto, Group>().ReverseMap();
             CreateMap<UpdateGroupDto, Group>().ReverseMap();
-            CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, Dto.UserDtos.UserDto>().ReverseMap();
             CreateMap<Ride, RideDto>().ReverseMap();
             CreateMap<Domain.Route, RouteDto>().ReverseMap();
             CreateMap<Post, PostDto>().ReverseMap();

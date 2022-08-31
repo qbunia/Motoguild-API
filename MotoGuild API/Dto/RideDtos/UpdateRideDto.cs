@@ -22,8 +22,8 @@ namespace MotoGuild_API.Dto.RideDtos
         [Required]
         public DateTime StartTime { get; set; }
         
-        public UserDto Owner { get; set; }
-        public ICollection<UserDto> Participants { get; set; } = new List<UserDto>();
+        public UserDtos.UserDto Owner { get; set; }
+        public ICollection<UserDtos.UserDto> Participants { get; set; } = new List<UserDtos.UserDto>();
         public ICollection<PostDto>? Posts { get; set; } = new List<PostDto>();
 
         public ICollection<StopDto>? Stops { get; set; } = new List<StopDto>();
