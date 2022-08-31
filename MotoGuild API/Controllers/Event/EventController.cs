@@ -3,9 +3,12 @@ using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
-using MotoGuild_API.Models.Event;
+
 using MotoGuild_API.Repository.Interface;
 using System;
+using Igor.Gateway.Dtos.Events;
+using MotoGuild_API.Dto.EventDtos;
+using EventDto = MotoGuild_API.Dto.EventDtos.EventDto;
 
 namespace MotoGuild_API.Controllers;
 

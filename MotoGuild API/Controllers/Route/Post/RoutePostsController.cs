@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,12 @@ namespace MotoGuild_API.Controllers
 [Route("api/routes/{routeId:int}/posts")]
 public class RoutePostsController : ControllerBase
 {
-    private readonly MotoGuildDbContext _db;
+        private readonly MotoGuildDbContext _db;
+        private readonly IMapper _mapper;
+        private readonly IPostRepository _postRepository;
 
-    public RoutePostsController(MotoGuildDbContext dbContext)
+
+        public RoutePostsController(MotoGuildDbContext dbContext)
     {
         _db = dbContext;
     }

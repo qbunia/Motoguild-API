@@ -14,10 +14,10 @@ namespace Domain
         public string Name { get; set; }
         public User Owner { get; set; }
         public string Description { get; set; }
-        public ICollection<User> Participants { get; set; }
+        public ICollection<User> Participants { get; set; } = new List<User>();
         public string Place { get; set; }
         public DateTime Start { get; set; }
         public DateTime Stop { get; set; }
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }
