@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain
+﻿namespace Domain
 {
     public class Post
     {
@@ -12,6 +6,6 @@ namespace Domain
         public User Author { get; set; }
         public DateTime CreateTime { get; set; }
         public string Content { get; set; }
-        public ICollection<Comment> Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

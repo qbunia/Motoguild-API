@@ -1,122 +1,82 @@
-﻿using Data;
-using Domain;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.UserDtos;
+using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:int}/pendingusers")]
-[EnableCors("AllowAnyOrigin")]
 public class GroupPendingUsersController : ControllerBase
 {
-    private readonly MotoGuildDbContext _db;
+    private readonly IGroupPendingUsersRepository _groupPendingUsersRepository;
+    private readonly IMapper _mapper;
 
-    public GroupPendingUsersController(MotoGuildDbContext dbContext)
+    public GroupPendingUsersController(IGroupPendingUsersRepository groupPendingUsersRepository, IMapper mapper)
     {
-        _db = dbContext;
+        _groupPendingUsersRepository = groupPendingUsersRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult GetGroupPendingUsers(int groupId)
     {
-        var group = _db.Groups
-            .Include(g => g.PendingUsers)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-
-        var pendingUsers = group.PendingUsers.ToList();
-
-        if (pendingUsers == null) return NotFound();
-        var pendingUsersDto = GetGroupPendingUsersDtos(pendingUsers);
-        return Ok(pendingUsersDto);
+        var pendingUsers = _groupPendingUsersRepository.GetAll(groupId);
+        if (pendingUsers == null)
+        {
+            return NotFound();
+        }
+        return Ok(_mapper.Map<List<UserDto>>(pendingUsers));
     }
 
     [HttpGet("{id:int}", Name = "GetGroupPendingUser")]
     public IActionResult GetGroupPendingUser(int groupId, int id)
     {
-        var group = _db.Groups
-            .Include(g => g.PendingUsers)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-
-        var participant = group.PendingUsers.FirstOrDefault(p => p.Id == id);
-
-        if (participant == null) return NotFound();
-
-        var participantDto = GetGroupPendingUserDto(participant);
-        return Ok(participantDto);
+        var pendingUsers = _groupPendingUsersRepository.Get(groupId, id);
+        if (pendingUsers == null)
+        {
+            return NotFound();
+        }
+        return Ok(_mapper.Map<UserDto>(pendingUsers));
     }
 
     [HttpPost("{id:int}")]
     public IActionResult AddGroupPendingUserByUserId(int groupId, int id)
     {
-        var group = _db.Groups
-            .Include(g => g.PendingUsers)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
+        if (!_groupPendingUsersRepository.GroupExist(groupId) || !_groupPendingUsersRepository.UserExits(id))
+        {
+            return NotFound();
+        }
 
-        var pendingUser = _db.Users.FirstOrDefault(p => p.Id == id);
-
-        if (pendingUser == null) return NotFound();
-
-        SaveGroupPendingUserToDataBase(group, pendingUser);
-        var pendingUserDto = GetGroupPendingUserDto(pendingUser);
-        return Ok(pendingUserDto);
+        if (_groupPendingUsersRepository.UserInPendingUsers(groupId, id))
+        {
+            return BadRequest();
+        }
+        _groupPendingUsersRepository.AddPendingUserByUserId(groupId, id);
+        _groupPendingUsersRepository.Save();
+        var user = _groupPendingUsersRepository.GetUser(id);
+        var userDto = _mapper.Map<UserDto>(user);
+        return CreatedAtRoute("GetGroupPendingUser", new { id = userDto.Id, groupId = groupId }, userDto);
     }
 
-    private void SaveGroupPendingUserToDataBase(Group group, User pendingUser)
-    {
-        group.PendingUsers.Add(pendingUser);
-        _db.SaveChanges();
-    }
 
     [HttpDelete("{id:int}")]
     public IActionResult DeleteGroupPendingUserByUserId(int groupId, int id)
     {
-        var group = _db.Groups
-            .Include(g => g.PendingUsers)
-            .FirstOrDefault(g => g.Id == groupId);
-        if (group == null) return NotFound();
-
-        var pendingUser = _db.Users.FirstOrDefault(p => p.Id == id);
-
-        if (pendingUser == null) return NotFound();
-
-        DeleteGroupPendingUserFromDataBase(group, pendingUser);
-        var pendingUserDto = GetGroupPendingUserDto(pendingUser);
-        return Ok(pendingUserDto);
-    }
-
-    private void DeleteGroupPendingUserFromDataBase(Group group, User pendingUser)
-    {
-        group.PendingUsers.Remove(pendingUser);
-        _db.SaveChanges();
-    }
-
-    private List<UserDto> GetGroupPendingUsersDtos(List<User> pendingUsers)
-    {
-        var pendingUsersDtos = new List<UserDto>();
-        foreach (var pendingUser in pendingUsers)
-            pendingUsersDtos.Add(new UserDto
-            {
-                Email = pendingUser.Email, Rating = pendingUser.Rating, Id = pendingUser.Id,
-                UserName = pendingUser.UserName
-            });
-        return pendingUsersDtos;
-    }
-
-    private UserDto GetGroupPendingUserDto(User pendingUser)
-    {
-        var pendingUserDto = new UserDto
+        if (!_groupPendingUsersRepository.GroupExist(groupId) || !_groupPendingUsersRepository.UserExits(id))
         {
-            Email = pendingUser.Email,
-            Id = pendingUser.Id,
-            Rating = pendingUser.Rating,
-            UserName = pendingUser.UserName
-        };
-        return pendingUserDto;
+            return NotFound();
+        }
+
+        if (!_groupPendingUsersRepository.UserInPendingUsers(groupId, id))
+        {
+            return NotFound();
+        }
+        _groupPendingUsersRepository.DeletePendingUserByUserId(groupId, id);
+        _groupPendingUsersRepository.Save();
+
+        return NoContent();
     }
+
 }

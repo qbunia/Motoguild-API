@@ -1,17 +1,13 @@
 using AutoMapper;
-using Data;
-using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.UserDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
 
 [ApiController]
 [Route("api/rides/{rideId:int}/participants")]
-[EnableCors("AllowAnyOrigin")]
 public class RideParticipantsController : ControllerBase
 {
     private readonly IRideParticipantsRepository _rideParticipantsRepository;

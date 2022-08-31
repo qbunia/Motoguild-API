@@ -56,10 +56,12 @@ namespace MotoGuild_API.Repository
         public IEnumerable<Comment>? GetAll(int postId)
         {
             var post = _context.Posts.Include(u => u.Author).Include(c => c.Comments).FirstOrDefault(c => c.Id == postId);
+
             if (post == null)
             {
                 return null;
             }
+
             return post.Comments;
             
         }

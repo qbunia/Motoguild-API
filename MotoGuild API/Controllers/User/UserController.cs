@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
-using Data;
 using Domain;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.UserDtos;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    [EnableCors("AllowAnyOrigin")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;

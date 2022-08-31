@@ -1,18 +1,16 @@
 ﻿using AutoMapper;
-using Data;
-using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MotoGuild_API.Models.Route;
-using MotoGuild_API.Models.User;
+using MotoGuild_API.Dto.RouteDtos;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace MotoGuild_API.Controllers.Route
 {
     [ApiController]
     [Route("api/routes")]
-    [EnableCors("AllowAnyOrigin")]
     public class RouteController : ControllerBase
     {
 
@@ -26,23 +24,26 @@ namespace MotoGuild_API.Controllers.Route
         }
 
         [HttpGet]
-        public IActionResult GetRoutes([FromQuery] bool orderByRating = false)
+        public IActionResult GetRoutes([FromQuery] PaginationParams @params, [FromQuery] bool orderByRating = false)
         {
+            var paginationMetadata = new PaginationMetadata(_routeRepository.TotalNumberOfRoutes(), @params.Page,
+                @params.ItemsPerPage);
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
             if (!orderByRating)
             {
-                var routes = _routeRepository.GetAll();
+                var routes = _routeRepository.GetAll(@params);
                 return Ok(_mapper.Map<List<RouteDto>>(routes));
             }
             else
             {
-                var selectedRoutes = _routeRepository.GetFiveOrderByRating();
+                var selectedRoutes = _routeRepository.GetFiveOrderByRating(@params);
                 return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
             }
-            
+
         }
 
         [HttpGet("{id:int}", Name = "GetRoute")]
-        public IActionResult GetRoute(int id, [FromQuery] bool selectedData = false)
+        public IActionResult GetRoute(int id)
         {
             var route = _routeRepository.Get(id);
             if (route == null) return NotFound();

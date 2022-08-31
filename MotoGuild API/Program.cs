@@ -18,18 +18,24 @@ builder.Services.AddDbContext<MotoGuildDbContext>(options =>
 });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAnyOrigin", builder =>
+    options.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        builder.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+            .WithExposedHeaders("X-Pagination");
 
     });
 });
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IFeedRepository, FeedRepository>();
 builder.Services.AddScoped<IGroupParticipantsRepository, GroupParticipantsRepository>();
+builder.Services.AddScoped<IGroupPendingUsersRepository, GroupPendingUsersRepository>();
+builder.Services.AddScoped<IRideParticipantsRepository, RideParticipantsRepository>();
 builder.Services.AddScoped<IRideRepository, RideRepository>();
 builder.Services.AddScoped<IRouteRepository, RouteRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IRouteStopsRepository, RouteStopsRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 var app = builder.Build();

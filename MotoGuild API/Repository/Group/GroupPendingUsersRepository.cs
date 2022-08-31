@@ -6,29 +6,29 @@ using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Repository
 {
-    public class RideParticipantsRepository : IRideParticipantsRepository
+    public class GroupPendingUsersRepository : IGroupPendingUsersRepository
     {
         private MotoGuildDbContext _context;
 
-        public RideParticipantsRepository(MotoGuildDbContext context)
+        public GroupPendingUsersRepository(MotoGuildDbContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<User> GetAll(int rideId)
+        public IEnumerable<User> GetAll(int groupId)
         {
-            var ride = _context.Rides
-                .Include(g => g.Participants)
-                .FirstOrDefault(g => g.Id == rideId);
-            var participants = ride.Participants.ToList();
-            return participants;
+            var group = _context.Groups
+                .Include(g => g.PendingUsers)
+                .FirstOrDefault(g => g.Id == groupId);
+            var pendingUsers = group.PendingUsers.ToList();
+            return pendingUsers;
         }
 
-        public User Get(int rideId, int participantId)
+        public User Get(int groupId, int pendingUserId)
         {
-            var participants = GetAll(rideId);
+            var pendingUsers = GetAll(groupId);
 
-            return participants.FirstOrDefault(p => p.Id == participantId);
+            return pendingUsers.FirstOrDefault(p => p.Id == pendingUserId);
         }
 
         public User GetUser(int userId)
@@ -36,25 +36,25 @@ namespace MotoGuild_API.Repository
             return _context.Users.Find(userId);
         }
 
-        public void AddParticipantByUserId(int rideId, int userId)
+        public void AddPendingUserByUserId(int groupId, int userId)
         {
-            var ride = _context.Rides
-                .Include(g => g.Participants)
-                .FirstOrDefault(g => g.Id == rideId);
+            var group = _context.Groups
+                .Include(g => g.PendingUsers)
+                .FirstOrDefault(g => g.Id == groupId);
             var user = _context.Users
                 .FirstOrDefault(u => u.Id == userId);
-            ride.Participants.Add(user);
+            group.PendingUsers.Add(user);
         
         }
 
-        public void DeleteParticipantByUserId(int rideId, int userId)
+        public void DeletePendingUserByUserId(int groupId, int userId)
         {
-            var ride = _context.Rides
-                .Include(g => g.Participants)
-                .FirstOrDefault(g => g.Id == rideId);
+            var group = _context.Groups
+                .Include(g => g.PendingUsers)
+                .FirstOrDefault(g => g.Id == groupId);
             var user = _context.Users
                 .FirstOrDefault(u => u.Id == userId);
-            ride.Participants.Remove(user);
+            group.PendingUsers.Remove(user);
         }
 
         public void Update(User user)
@@ -62,10 +62,10 @@ namespace MotoGuild_API.Repository
             _context.Entry(user).State = EntityState.Modified;
         }
 
-        public bool RideExist(int rideId)
+        public bool GroupExist(int groupId)
         {
-            var ride = _context.Rides.FirstOrDefault(g => g.Id == rideId);
-            return ride != null;
+            var group = _context.Groups.FirstOrDefault(g => g.Id == groupId);
+            return group != null;
         }
 
         public bool UserExits(int userId)
@@ -74,12 +74,12 @@ namespace MotoGuild_API.Repository
             return user != null;
         }
 
-        public bool UserInRide(int rideId, int userId)
+        public bool UserInPendingUsers(int groupId, int userId)
         {
-            var ride = _context.Rides.Include(g => g.Participants).FirstOrDefault(g => g.Id == rideId);
-            if (ride != null)
+            var group = _context.Groups.Include(g => g.PendingUsers).FirstOrDefault(g => g.Id == groupId);
+            if (group != null)
             {
-                var participantsIds = ride.Participants.Select(p => p.Id);
+                var participantsIds = group.PendingUsers.Select(p => p.Id);
                 return participantsIds.Contains(userId);
             }
             return false;
