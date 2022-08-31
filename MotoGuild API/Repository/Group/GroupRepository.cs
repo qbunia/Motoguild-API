@@ -1,6 +1,7 @@
 ﻿using Data;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Repository
@@ -14,19 +15,30 @@ namespace MotoGuild_API.Repository
             _context = context;
         }
 
-        public IEnumerable<Group> GetAll()
+        public IEnumerable<Group> GetAll(PaginationParams @params)
         {
             return _context.Groups
                 .Include(g => g.Owner)
                 .Include(g => g.Participants)
                 .Include(g => g.PendingUsers)
                 .Include(g => g.Posts).ThenInclude(p => p.Author)
+                .Skip((@params.Page - 1) * @params.ItemsPerPage)
+                .Take(@params.ItemsPerPage)
                 .ToList();
+        }
+
+        public int TotalNumberOfGroups()
+        {
+            return _context.Groups.Count();
         }
 
         public Group Get(int id)
         {
-            return _context.Groups.Find(id);
+            return _context.Groups.Include(g => g.Owner)
+                .Include(g => g.Participants)
+                .Include(g => g.PendingUsers)
+                .Include(g => g.Posts).ThenInclude(p => p.Author)
+                .FirstOrDefault(g=>g.Id == id);
         }
 
         public void Insert(Group group)

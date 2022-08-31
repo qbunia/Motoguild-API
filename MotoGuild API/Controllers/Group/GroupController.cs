@@ -1,8 +1,10 @@
-﻿using AutoMapper;
+﻿using System.Text.Json;
+using AutoMapper;
 using Domain;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.GroupDtos;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Controllers;
@@ -21,9 +23,12 @@ public class GroupController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetGroups()
+    public IActionResult GetGroups([FromQuery] PaginationParams @params)
     {
-        var groups = _groupRepository.GetAll();
+        var paginationMetadata = new PaginationMetadata(_groupRepository.TotalNumberOfGroups(), @params.Page,
+            @params.ItemsPerPage);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+        var groups = _groupRepository.GetAll(@params);
         return Ok(_mapper.Map<List<SelectedGroupDto>>(groups));
     }
 
