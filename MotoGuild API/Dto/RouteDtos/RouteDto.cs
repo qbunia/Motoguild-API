@@ -14,7 +14,7 @@ namespace MotoGuild_API.Dto.RouteDtos
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public int Rating { get; set; }
-        public UserDto Owner { get; set; }
+        public UserDtos.UserDto Owner { get; set; }
         public List<StopDto> Stops { get; set; }
         public List<PostDto> Posts { get; set; }
     }
@@ -27,7 +27,7 @@ namespace MotoGuild_API.Dto.RouteDtos
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
         public int Rating { get; set; }
-        public UserDto Owner { get; set; }
+        public UserDtos.UserDto Owner { get; set; }
         public List<StopDto> Stops { get; set; }
     }
 

@@ -9,7 +9,6 @@ namespace MotoGuild_API.Controllers
 {
     [ApiController]
     [Route("api/feed/{feedId:int}/post")]
-    [EnableCors("AllowAnyOrigin")]
     public class FeedPostController : ControllerBase
     {
         private readonly IPostRepository _postRepository;
@@ -32,18 +31,19 @@ namespace MotoGuild_API.Controllers
         public IActionResult GetPostFeed(int postId)
         {
             var post = _postRepository.Get(postId);
-            if (post == null) return NotFound(); 
+            if (post == null) return NotFound();
             return Ok(_mapper.Map<PostDto>(post));
         }
 
         [HttpPost]
-        public IActionResult CreatePost(int feedId, [FromBody] CreatePostDto createPostDto)
+        public IActionResult CreateFeedPost(int feedId, [FromBody] CreatePostDto createPostDto)
         {
+            createPostDto.CreateTime = DateTime.Now;
             var post = _mapper.Map<Post>(createPostDto);
             _postRepository.InsertToFeed(post, feedId);
             _postRepository.Save();
             var postDto = _mapper.Map<PostDto>(post);
-            return CreatedAtRoute("GetFeedPost", new { id = postDto.Id }, postDto);
+            return CreatedAtRoute("GetFeedPost", new { feedId = feedId, postId = postDto.Id }, postDto);
         }
 
         [HttpDelete("{postId:int}")]

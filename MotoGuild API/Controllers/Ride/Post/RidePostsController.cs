@@ -7,7 +7,7 @@ using MotoGuild_API.Repository.Interface;
 namespace MotoGuild_API.Controllers.Ride.Post
 {
     [ApiController]
-    [Route("api/rides/{rideId:int}/posts")]
+    [Route("api/ride/{rideId:int}/post")]
     public class RidePostsController : ControllerBase
     {
         private readonly IPostRepository _postRepository;
@@ -25,7 +25,7 @@ namespace MotoGuild_API.Controllers.Ride.Post
             return Ok(_mapper.Map<List<PostDto>>(posts));
         }
 
-        [HttpGet("postId:int", Name = "GetRidePost")]
+        [HttpGet("{postId:int}", Name = "GetRidePost")]
         public IActionResult GetRidePost(int postId)
         {
             var post = _postRepository.Get(postId);

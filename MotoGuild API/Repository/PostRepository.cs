@@ -46,57 +46,66 @@ namespace MotoGuild_API.Repository
 
         public Post? Get(int postId)
         {
-            var post = _context.Posts.Include(c => c.Comments).FirstOrDefault(x => x.Id == postId);
+            var post = _context.Posts.Include(p => p.Author).Include(c => c.Comments).ThenInclude(c => c.Author).FirstOrDefault(x => x.Id == postId);
             return post != null ? post : null;
         }
 
         public IEnumerable<Post>? GetAll()
         {
-            return _context.Posts.Include(c => c.Comments).ToList();
+            return _context.Posts.Include(p => p.Author).Include(c => c.Comments).ThenInclude(c => c.Author).ToList();
         }
 
         public IEnumerable<Post>? GetAllFeed(int feedId)
         {
-            var posts = _context.Feed.Include(f =>f.Posts).FirstOrDefault(f => f.Id == feedId).Posts;
+            var posts = _context.Feed.Include(f =>f.Posts).ThenInclude(p => p.Author).FirstOrDefault(f => f.Id == feedId).Posts;
             return posts != null ? posts : Enumerable.Empty<Post>();
 
         }
 
         public IEnumerable<Post>? GetAllGroup(int groupId)
         {
-            var posts = _context.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId).Posts;
+
+            var posts = _context.Groups.Include(g => g.Posts).ThenInclude(p => p.Author).FirstOrDefault(g => g.Id == groupId).Posts;
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
         public IEnumerable<Post>? GetAllRide(int rideId)
         {
-            var posts = _context.Rides.Include(r => r.Posts).FirstOrDefault(r => r.Id == rideId).Posts;
+            var posts = _context.Rides.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == rideId).Posts;
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
         public IEnumerable<Post>? GetAllRoute(int routeId)
         {
-            var posts = _context.Groups.Include(r => r.Posts).FirstOrDefault(r => r.Id == routeId).Posts;
+            var posts = _context.Routes.Include(r => r.Posts).ThenInclude(r => r.Author).FirstOrDefault(r => r.Id == routeId).Posts;
             return posts != null ? posts : Enumerable.Empty<Post>();
         }
 
         public void InsertToFeed(Post post, int feedId)
         {
+            var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+            post.Author = ownerFull;
             _context.Feed.Include(f => f.Posts).FirstOrDefault(f => f.Id == feedId).Posts.Add(post);
         }
         public void InsertToGroup(Post post, int groupId)
         {
+            var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+            post.Author = ownerFull;
             _context.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId).Posts.Add(post);
         }
 
         public void InsertToRide(Post post, int rideId)
         {
-            _context.Groups.Include(r => r.Posts).FirstOrDefault(r => r.Id == rideId).Posts.Add(post);
+            var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+            post.Author = ownerFull;
+            _context.Rides.Include(r => r.Posts).FirstOrDefault(r => r.Id == rideId).Posts.Add(post);
         }
 
         public void InsertToRoute(Post post, int routeId)
         {
-            _context.Groups.Include(r => r.Posts).FirstOrDefault(r => r.Id == routeId).Posts.Add(post);
+            var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+            post.Author = ownerFull;
+            _context.Routes.Include(r => r.Posts).FirstOrDefault(r => r.Id == routeId).Posts.Add(post);
         }
         public void Save()
         {
