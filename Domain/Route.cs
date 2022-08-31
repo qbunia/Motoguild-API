@@ -12,10 +12,10 @@ namespace Domain
         public string Name { get; set; }
         public string Description { get; set; }
         public User Owner { get; set; }
-        public ICollection<Stop> Stops { get; set; }
+        public ICollection<Stop> Stops { get; set; }  = new List<Stop>();
         public string StartPlace { get; set; }
         public string EndingPlace { get; set; }
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<Post> Posts { get; set; }  = new List<Post>();
         public int Rating { get; set; }
     }
 }

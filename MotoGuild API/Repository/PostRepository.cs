@@ -52,7 +52,7 @@ namespace MotoGuild_API.Repository
 
         public IEnumerable<Post>? GetAll()
         {
-            return _context.Posts.Include(p => p.Author).Include(c => c.Comments).ThenInclude(c => c.Author).ToList();
+            return _context.Posts.Include(p => p.Author).Include(c => c.Comments).ThenInclude(c => c.Author);
         }
 
         public IEnumerable<Post>? GetAllFeed(int feedId)

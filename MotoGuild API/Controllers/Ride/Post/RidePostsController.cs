@@ -29,7 +29,7 @@ namespace MotoGuild_API.Controllers.Ride.Post
         public IActionResult GetRidePost(int postId)
         {
             var post = _postRepository.Get(postId);
-            return Ok(_mapper.Map<List<PostDto>>(post));
+            return Ok(_mapper.Map<PostDto>(post));
         }
 
         [HttpPost]
@@ -39,7 +39,7 @@ namespace MotoGuild_API.Controllers.Ride.Post
             _postRepository.InsertToRide(post, rideId);
             _postRepository.Save();
             var postDto = _mapper.Map<PostDto>(post);
-            return CreatedAtRoute("GetRidePost", new { id = postDto.Id }, postDto);
+            return CreatedAtRoute("GetRidePost", new { rideId = rideId, postId = postDto.Id }, postDto);
         }
 
         [HttpDelete("{postId:int}")]
