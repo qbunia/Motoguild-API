@@ -31,7 +31,7 @@ namespace MotoGuild_API.Repository
 
         public int TotalNumberOfRides()
         {
-            return _context.Routes.Count();
+            return _context.Rides.Count();
         }
         
         public Ride Get(int id)
