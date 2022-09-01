@@ -13,7 +13,7 @@ namespace Domain
         public User Owner { get; set; }
         public string Description { get; set; }
         public ICollection<User> Participants { get; set; }
-        public Route Route { get; set; }
+        public Route? Route { get; set; }
         public DateTime StartTime { get; set; }
         public int Estimation { get; set; }
         public ICollection<Post> Posts { get; set; }
