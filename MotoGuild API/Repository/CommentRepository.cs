@@ -74,6 +74,8 @@ namespace MotoGuild_API.Repository
 
         public void Insert(Comment comment)
         {
+            var user = _context.Users.FirstOrDefault(u => u.Id == comment.Author.Id);
+            comment.Author = user;
             _context.Comments.Add(comment);
         }
 

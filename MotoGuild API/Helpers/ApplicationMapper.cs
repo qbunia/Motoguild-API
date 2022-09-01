@@ -39,6 +39,7 @@ namespace MotoGuild_API.Helpers
             CreateMap<UpdateEventDto, Event>().ReverseMap();
 
             CreateMap<Comment, CommentDto>().ReverseMap();
+            CreateMap<Comment, CreateCommentDto>().ReverseMap();
             CreateMap<FeedDto, Feed>().ReverseMap();
         }
     }

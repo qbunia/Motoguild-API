@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using AutoMapper.QueryableExtensions;
+using Data;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using MotoGuild_API.Helpers;
@@ -58,6 +59,13 @@ namespace MotoGuild_API.Repository
 
         public void Delete(int id)
         {
+            var ridesWithRoute = _context.Rides
+                .Include(r => r.Route)
+                .Where(r => r.Route.Id == id);
+            foreach (var ride in ridesWithRoute)
+            {
+                ride.Route = null;
+            }
             Route route = _context.Routes
                 .Include(g => g.Posts)
                 .Include(r => r.Posts)
