@@ -38,17 +38,18 @@ namespace MotoGuild_API.Controllers.Comment
         public IActionResult GetPostComment(int commentId)
         {
             var comment = _commentRepository.Get(commentId);
-            return Ok(_mapper.Map<List<CommentDto>>(comment));
+            return Ok(_mapper.Map<CommentDto>(comment));
         }
 
         [HttpPost]
-        public IActionResult CreatePostComment([FromBody] CreateCommentDto createCommentDto)
+        public IActionResult CreatePostComment([FromBody] CreateCommentDto createCommentDto, int postId)
         {
+            createCommentDto.CreateTime = DateTime.Now;
             var comment = _mapper.Map<Domain.Comment>(createCommentDto);
             _commentRepository.Insert(comment);
             _commentRepository.Save();
             var commentDto = _mapper.Map<CommentDto>(comment);
-            return CreatedAtRoute("GetComment", new { id = commentDto.Id }, commentDto);
+            return CreatedAtRoute("GetComment", new { commentId = commentDto.Id, postId=postId }, commentDto);
 
         }
 
