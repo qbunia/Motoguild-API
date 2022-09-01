@@ -32,8 +32,8 @@ namespace MotoGuild_API.Repository
         {
             var ownerFull = _context.Users.FirstOrDefault(u => u.Id == eve.Owner.Id);
             eve.Owner = ownerFull;
+            eve.Participants.Add(ownerFull);
             _context.Events.Add(eve);
-            eve.Participants.Add(eve.Owner);
         }
 
         public void Delete(int eveId)
