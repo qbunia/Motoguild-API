@@ -45,7 +45,7 @@ namespace MotoGuild_API.Repository
 
         public Comment? Get(int commentId)
         {
-            var comment = _context.Comments.FirstOrDefault(c => c.Id == commentId);
+            var comment = _context.Comments.Include(c => c.Author).FirstOrDefault(c => c.Id == commentId);
             if (comment != null) {
 
                 return comment;
@@ -55,7 +55,7 @@ namespace MotoGuild_API.Repository
 
         public IEnumerable<Comment>? GetAll(int postId)
         {
-            var post = _context.Posts.Include(u => u.Author).Include(c => c.Comments).FirstOrDefault(c => c.Id == postId);
+            var post = _context.Posts.Include(c => c.Comments).ThenInclude(c => c.Author).FirstOrDefault(c => c.Id == postId);
 
             if (post == null)
             {
@@ -68,7 +68,7 @@ namespace MotoGuild_API.Repository
 
         public IEnumerable<Comment>? GetAll()
         {
-            return _context.Comments.ToList();
+            return _context.Comments.Include(c => c.Author).ToList();
             
         }
 

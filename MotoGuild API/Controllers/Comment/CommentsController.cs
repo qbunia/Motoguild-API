@@ -20,25 +20,26 @@ namespace MotoGuild_API.Controllers.Comment
             _mapper = mapper;
         }
 
-        //[HttpGet]
-        //public IActionResult GetComments()
-        //{
-        //    var comments = _commentRepository.GetAll();
-        //    return Ok(_mapper.Map<List<CommentDto>>(comments));
-        //}
-
         [HttpGet]
         public IActionResult GetPostComments(int postId)
         {
-            var comments = _commentRepository.GetAll(postId);
-            return Ok(_mapper.Map<List<CommentDto>>(comments));
+            if (postId != 0)
+            {
+                var comments = _commentRepository.GetAll(postId);
+                return Ok(_mapper.Map<List<CommentDto>>(comments));
+            }
+            else
+            {
+                var comments = _commentRepository.GetAll();
+                return Ok(_mapper.Map<List<CommentDto>>(comments));
+            }
         }
 
         [HttpGet("{commentId:int}", Name = "GetPostComment")]
         public IActionResult GetPostComment(int commentId)
         {
             var comment = _commentRepository.Get(commentId);
-            return Ok(_mapper.Map<List<CommentDto>>(comment));
+            return Ok(_mapper.Map<CommentDto>(comment));
         }
 
         [HttpPost]
