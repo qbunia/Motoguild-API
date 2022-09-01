@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.CommentDtos;
 using MotoGuild_API.Repository.Interface;
@@ -47,10 +46,10 @@ namespace MotoGuild_API.Controllers.Comment
         {
             createCommentDto.CreateTime = DateTime.Now;
             var comment = _mapper.Map<Domain.Comment>(createCommentDto);
-            _commentRepository.Insert(comment);
+            _commentRepository.Insert(comment, postId);
             _commentRepository.Save();
             var commentDto = _mapper.Map<CommentDto>(comment);
-            return CreatedAtRoute("GetComment", new { commentId = commentDto.Id, postId=postId }, commentDto);
+            return CreatedAtRoute("GetPostComment", new { commentId = commentDto.Id, postId = postId }, commentDto);
 
         }
 

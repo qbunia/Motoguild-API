@@ -72,11 +72,11 @@ namespace MotoGuild_API.Repository
             
         }
 
-        public void Insert(Comment comment)
+        public void Insert(Comment comment, int postId)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == comment.Author.Id);
             comment.Author = user;
-            _context.Comments.Add(comment);
+            _context.Posts.Include(p => p.Comments).FirstOrDefault(p => p.Id == postId).Comments.Add(comment);
         }
 
         public void Save()

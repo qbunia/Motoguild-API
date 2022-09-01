@@ -7,7 +7,7 @@ namespace MotoGuild_API.Repository.Interface
         IEnumerable<Comment>? GetAll(int postId);
         IEnumerable<Comment>? GetAll();
         Comment? Get(int commentId);
-        void Insert(Comment comment);
+        void Insert(Comment comment, int postId);
         void Delete(int commentId);
         void Update(Comment comment);
         void Save();
