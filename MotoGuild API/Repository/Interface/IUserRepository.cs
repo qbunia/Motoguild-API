@@ -6,6 +6,10 @@ public interface IUserRepository : IDisposable
 {
     IEnumerable<User> GetAll();
     User Get(int userId);
+
+    bool UserNameExist(string name);
+
+    User GetUserByName(string name);
     void Insert(User user);
     void Delete(int userId);
     void Update(User user);

@@ -27,6 +27,16 @@ public class UserRepository : IUserRepository
         return _context.Users.Find(userId);
     }
 
+    public bool UserNameExist(string name)
+    {
+        return _context.Users.FirstOrDefault(u => u.UserName == name) != null;
+    }
+
+    public User GetUserByName(string name)
+    {
+        return _context.Users.FirstOrDefault(u => u.UserName == name);
+    }
+
     public void Insert(User user)
     {
         _context.Users.Add(user);

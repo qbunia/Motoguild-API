@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(MotoGuildDbContext))]
-    [Migration("20220808101508_Create database")]
-    partial class Createdatabase
+    [Migration("20220906132824_user roles add")]
+    partial class userrolesadd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,9 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -42,14 +45,11 @@ namespace Data.Migrations
                     b.Property<int?>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("AuthorId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PostId");
 
                     b.ToTable("Comments");
                 });
@@ -70,6 +70,9 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Place")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -80,9 +83,29 @@ namespace Data.Migrations
                     b.Property<DateTime>("Stop")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("UserId");
+
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("Domain.Feed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Feed");
                 });
 
             modelBuilder.Entity("Domain.Group", b =>
@@ -93,7 +116,7 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsPrivate")
@@ -103,7 +126,17 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Groups");
                 });
@@ -129,6 +162,9 @@ namespace Data.Migrations
                     b.Property<int?>("EventId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FeedId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
@@ -143,6 +179,8 @@ namespace Data.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("FeedId");
 
                     b.HasIndex("GroupId");
 
@@ -165,10 +203,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EndingPlace")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Estimation")
                         .HasColumnType("int");
 
@@ -179,14 +213,25 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StartPlace")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RouteId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("RouteId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Rides");
                 });
@@ -211,6 +256,9 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -218,12 +266,9 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Routes");
                 });
@@ -248,15 +293,10 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RideId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("RouteId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RideId");
 
                     b.HasIndex("RouteId");
 
@@ -275,13 +315,25 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<int?>("PhoneNumber")
                         .HasColumnType("int");
 
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
-                    b.Property<string>("UserName")
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -295,12 +347,12 @@ namespace Data.Migrations
                     b.Property<int>("EventsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersId")
+                    b.Property<int>("ParticipantsId")
                         .HasColumnType("int");
 
-                    b.HasKey("EventsId", "UsersId");
+                    b.HasKey("EventsId", "ParticipantsId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("ParticipantsId");
 
                     b.ToTable("EventUser");
                 });
@@ -310,44 +362,89 @@ namespace Data.Migrations
                     b.Property<int>("GroupsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersId")
+                    b.Property<int>("ParticipantsId")
                         .HasColumnType("int");
 
-                    b.HasKey("GroupsId", "UsersId");
+                    b.HasKey("GroupsId", "ParticipantsId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("ParticipantsId");
 
                     b.ToTable("GroupUser");
                 });
 
+            modelBuilder.Entity("GroupUser1", b =>
+                {
+                    b.Property<int>("PendingGroupsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PendingUsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PendingGroupsId", "PendingUsersId");
+
+                    b.HasIndex("PendingUsersId");
+
+                    b.ToTable("GroupUser1");
+                });
+
             modelBuilder.Entity("RideUser", b =>
                 {
+                    b.Property<int>("ParticipantsId")
+                        .HasColumnType("int");
+
                     b.Property<int>("RidesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
+                    b.HasKey("ParticipantsId", "RidesId");
 
-                    b.HasKey("RidesId", "UsersId");
-
-                    b.HasIndex("UsersId");
+                    b.HasIndex("RidesId");
 
                     b.ToTable("RideUser");
                 });
 
             modelBuilder.Entity("Domain.Comment", b =>
                 {
+                    b.HasOne("Domain.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Post", null)
                         .WithMany("Comments")
                         .HasForeignKey("PostId");
 
-                    b.HasOne("Domain.User", "User")
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Domain.Event", b =>
+                {
+                    b.HasOne("Domain.User", "Owner")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("Domain.User", null)
+                        .WithMany("OwnedEvents")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Domain.Group", b =>
+                {
+                    b.HasOne("Domain.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", null)
+                        .WithMany("OwnedGroups")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Domain.Post", b =>
@@ -361,6 +458,10 @@ namespace Data.Migrations
                     b.HasOne("Domain.Event", null)
                         .WithMany("Posts")
                         .HasForeignKey("EventId");
+
+                    b.HasOne("Domain.Feed", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("FeedId");
 
                     b.HasOne("Domain.Group", null)
                         .WithMany("Posts")
@@ -377,19 +478,40 @@ namespace Data.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("Domain.Ride", b =>
+                {
+                    b.HasOne("Domain.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Route", "Route")
+                        .WithMany()
+                        .HasForeignKey("RouteId");
+
+                    b.HasOne("Domain.User", null)
+                        .WithMany("OwnedRides")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Route");
+                });
+
             modelBuilder.Entity("Domain.Route", b =>
                 {
-                    b.HasOne("Domain.User", null)
+                    b.HasOne("Domain.User", "Owner")
                         .WithMany("Routes")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Domain.Stop", b =>
                 {
-                    b.HasOne("Domain.Ride", null)
-                        .WithMany("Stops")
-                        .HasForeignKey("RideId");
-
                     b.HasOne("Domain.Route", null)
                         .WithMany("Stops")
                         .HasForeignKey("RouteId");
@@ -405,7 +527,7 @@ namespace Data.Migrations
 
                     b.HasOne("Domain.User", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("ParticipantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -420,27 +542,47 @@ namespace Data.Migrations
 
                     b.HasOne("Domain.User", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GroupUser1", b =>
+                {
+                    b.HasOne("Domain.Group", null)
+                        .WithMany()
+                        .HasForeignKey("PendingGroupsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("PendingUsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("RideUser", b =>
                 {
+                    b.HasOne("Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Ride", null)
                         .WithMany()
                         .HasForeignKey("RidesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Domain.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Event", b =>
+                {
+                    b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("Domain.Feed", b =>
                 {
                     b.Navigation("Posts");
                 });
@@ -458,8 +600,6 @@ namespace Data.Migrations
             modelBuilder.Entity("Domain.Ride", b =>
                 {
                     b.Navigation("Posts");
-
-                    b.Navigation("Stops");
                 });
 
             modelBuilder.Entity("Domain.Route", b =>
@@ -471,6 +611,12 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Domain.User", b =>
                 {
+                    b.Navigation("OwnedEvents");
+
+                    b.Navigation("OwnedGroups");
+
+                    b.Navigation("OwnedRides");
+
                     b.Navigation("Routes");
                 });
 #pragma warning restore 612, 618
