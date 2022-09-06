@@ -10,6 +10,8 @@ public interface IUserRepository : IDisposable
     bool UserNameExist(string name);
 
     User GetUserByName(string name);
+
+    User FindUserByRefreshToken(string token);
     void Insert(User user);
     void Delete(int userId);
     void Update(User user);

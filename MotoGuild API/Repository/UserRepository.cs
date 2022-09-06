@@ -37,6 +37,11 @@ public class UserRepository : IUserRepository
         return _context.Users.FirstOrDefault(u => u.UserName == name);
     }
 
+    public User FindUserByRefreshToken(string token)
+    {
+        return _context.Users.FirstOrDefault(u => u.RefreshToken == token);
+    }
+
     public void Insert(User user)
     {
         _context.Users.Add(user);

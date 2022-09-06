@@ -18,12 +18,14 @@ public class UserController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public UserController(IUserRepository userRepository, IMapper mapper, IConfiguration configuration)
+    public UserController(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, ILoggedUserRepository loggedUserRepository)
     {
         _userRepository = userRepository;
         _mapper = mapper;
         _configuration = configuration;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -73,11 +75,71 @@ public class UserController : ControllerBase
 
         string token = CreateToken(user);
 
+        var refreshToken = GenerateRefreshToken();
+        SetRefreshToken(refreshToken, user);
+
         return Ok(token);
     }
 
+    [HttpPost("refresh-token")]
+    public IActionResult RefreshToken()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
 
+        var user = _userRepository.FindUserByRefreshToken(refreshToken);
+        if (user == null)
+        {
+            return Unauthorized("Invalid Refresh Token.");
+        }
 
+        if (user.TokenExpires < DateTime.Now)
+        {
+            return Unauthorized("Token expired.");
+        }
+
+        string token = CreateToken(user);
+        var newRefreshToken = GenerateRefreshToken();
+        SetRefreshToken(newRefreshToken, user);
+
+        return Ok(token);
+    }
+
+    private RefreshToken GenerateRefreshToken()
+    {
+        var refreshToken = new RefreshToken
+        {
+            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            Expires = DateTime.Now.AddDays(7),
+            Created = DateTime.Now
+        };
+
+        return refreshToken;
+    }
+
+    private void SetRefreshToken(RefreshToken newRefreshToken, User user)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = newRefreshToken.Expires
+        };
+        Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+
+        user.RefreshToken = newRefreshToken.Token;
+        user.TokenCreated = newRefreshToken.Created;
+        user.TokenExpires = newRefreshToken.Expires;
+        _userRepository.Save();
+
+    }
+
+    [Authorize]
+    [HttpGet("logged")]
+    public IActionResult GetLogged()
+    {
+        var user = _loggedUserRepository.GetLoggedUserName();
+
+        return Ok(user);
+    }
 
 
     [HttpDelete("{id:int}")]
