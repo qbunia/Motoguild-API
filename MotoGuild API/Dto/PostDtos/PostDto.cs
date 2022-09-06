@@ -1,14 +1,11 @@
-﻿
-using MotoGuild_API.Dto.UserDtos;
+﻿using MotoGuild_API.Dto.UserDtos;
 
-namespace MotoGuild_API.Dto.PostDtos
+namespace MotoGuild_API.Dto.PostDtos;
+
+public class PostDto
 {
-    public class PostDto
-    {
-        public int Id { get; set; }
-        public UserDtos.UserDto Author { get; set; }
-        public DateTime CreateTime { get; set; }
-        public string Content { get; set; }
-    }
-
+    public int Id { get; set; }
+    public UserDto Author { get; set; }
+    public DateTime CreateTime { get; set; }
+    public string Content { get; set; }
 }

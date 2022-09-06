@@ -1,15 +1,14 @@
 ﻿using Domain;
 
-namespace MotoGuild_API.Repository.Interface
+namespace MotoGuild_API.Repository.Interface;
+
+public interface ICommentRepository : IDisposable
 {
-    public interface ICommentRepository : IDisposable
-    {
-        IEnumerable<Comment>? GetAll(int postId);
-        IEnumerable<Comment>? GetAll();
-        Comment? Get(int commentId);
-        void Insert(Comment comment, int postId);
-        void Delete(int commentId);
-        void Update(Comment comment);
-        void Save();
-    }
+    IEnumerable<Comment>? GetAll(int postId);
+    IEnumerable<Comment>? GetAll();
+    Comment? Get(int commentId);
+    void Insert(Comment comment, int postId);
+    void Delete(int commentId);
+    void Update(Comment comment);
+    void Save();
 }
