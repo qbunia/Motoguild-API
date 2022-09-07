@@ -27,7 +27,7 @@ public class GroupController : ControllerBase
         var paginationMetadata = new PaginationMetadata(_groupRepository.TotalNumberOfGroups(), @params.Page,
             @params.ItemsPerPage);
         Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
-        var groups = _groupRepository.GetAll(@params);
+        var groups = _groupRepository.GetAll(@params).ToList();
         return Ok(_mapper.Map<List<SelectedGroupDto>>(groups));
     }
 
