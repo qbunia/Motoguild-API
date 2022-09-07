@@ -29,7 +29,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
     public IActionResult GetUsers()
     {
         var users = _userRepository.GetAll();
