@@ -37,6 +37,7 @@ public class RidePostsController : ControllerBase
     public IActionResult CreateRidePost(int rideId, [FromBody] CreatePostDto createPostDto)
     {
         var post = _mapper.Map<Post>(createPostDto);
+        post.CreateTime = DateTime.Now;
         _postRepository.InsertToRide(post, rideId);
         _postRepository.Save();
         var postDto = _mapper.Map<PostDto>(post);
