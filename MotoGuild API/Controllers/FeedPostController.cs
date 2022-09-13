@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.PostDtos;
 using MotoGuild_API.Repository.Interface;
@@ -20,6 +21,7 @@ public class FeedPostController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public IActionResult GetPostsFeed(int feedId)
     {
         var posts = _postRepository.GetAllFeed(feedId);
