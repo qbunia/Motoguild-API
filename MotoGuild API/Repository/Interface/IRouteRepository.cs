@@ -6,6 +6,7 @@ namespace MotoGuild_API.Repository.Interface;
 public interface IRouteRepository : IDisposable
 {
     IEnumerable<Route> GetAll(PaginationParams @params);
+    IEnumerable<Route> GetAllWithoutPagination();
     IEnumerable<Route> GetFiveOrderByRating(PaginationParams @params);
     int TotalNumberOfRoutes();
     Route Get(int routeId);

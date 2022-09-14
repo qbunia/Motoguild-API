@@ -27,6 +27,14 @@ public class RouteRepository : IRouteRepository
             .ToList();
     }
 
+    public IEnumerable<Route> GetAllWithoutPagination()
+    {
+        return _context.Routes
+            .Include(r => r.Owner)
+            .Include(r => r.Stops)
+            .ToList();
+    }
+
     public int TotalNumberOfRoutes()
     {
         return _context.Routes.Count();
