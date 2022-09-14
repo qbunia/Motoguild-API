@@ -38,6 +38,13 @@ public class RouteController : ControllerBase
         return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
     }
 
+    [HttpGet("all")]
+    public IActionResult GetAllRoutes()
+    {
+        var selectedRoutes = _routeRepository.GetAllWithoutPagination();
+        return Ok(_mapper.Map<List<RouteDto>>(selectedRoutes));
+    }
+
     [HttpGet("{id:int}", Name = "GetRoute")]
     public IActionResult GetRoute(int id)
     {
