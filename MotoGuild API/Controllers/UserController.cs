@@ -77,13 +77,21 @@ public class UserController : ControllerBase
         var refreshToken = GenerateRefreshToken();
         SetRefreshToken(refreshToken, user);
 
-        return Ok(token);
+        return Ok(new {token, refreshToken});
     }
 
     [HttpPost("refresh-token")]
     public IActionResult RefreshToken()
     {
-        var refreshToken = Request.Cookies["refreshToken"];
+        string refreshToken = "";
+
+        foreach (var header in Request.Headers)
+        {
+            if (header.Key == "x-refreshtoken")
+            {
+                refreshToken = header.Value;
+            }
+        }
 
         var user = _userRepository.FindUserByRefreshToken(refreshToken);
         if (user == null)
@@ -100,7 +108,7 @@ public class UserController : ControllerBase
         var newRefreshToken = GenerateRefreshToken();
         SetRefreshToken(newRefreshToken, user);
 
-        return Ok(token);
+        return Ok(new { token, newRefreshToken});
     }
 
     private RefreshToken GenerateRefreshToken()
