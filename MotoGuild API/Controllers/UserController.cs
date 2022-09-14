@@ -127,7 +127,7 @@ public class UserController : ControllerBase
     {
         var cookieOptions = new CookieOptions
         {
-            HttpOnly = true,
+            HttpOnly = false,
             Expires = newRefreshToken.Expires
         };
         Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
