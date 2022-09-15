@@ -8,6 +8,7 @@ public interface IUserRepository : IDisposable
     User Get(int userId);
 
     bool UserNameExist(string name);
+    bool UserEmailExist(string email);
 
     User GetUserByName(string name);
 
