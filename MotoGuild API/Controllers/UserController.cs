@@ -74,70 +74,70 @@ public class UserController : ControllerBase
 
         string token = CreateToken(user);
 
-        var refreshToken = GenerateRefreshToken();
-        SetRefreshToken(refreshToken, user);
+        //var refreshToken = GenerateRefreshToken();
+        //SetRefreshToken(refreshToken, user);
 
-        return Ok(new {token, refreshToken});
+        return Ok(token);
     }
 
-    [HttpPost("refresh-token")]
-    public IActionResult RefreshToken()
-    {
-        string refreshToken = "";
+    //[HttpPost("refresh-token")]
+    //public IActionResult RefreshToken()
+    //{
+    //    string refreshToken = "";
 
-        foreach (var header in Request.Headers)
-        {
-            if (header.Key == "x-refreshtoken")
-            {
-                refreshToken = header.Value;
-            }
-        }
+    //    foreach (var header in Request.Headers)
+    //    {
+    //        if (header.Key == "x-refreshtoken")
+    //        {
+    //            refreshToken = header.Value;
+    //        }
+    //    }
 
-        var user = _userRepository.FindUserByRefreshToken(refreshToken);
-        if (user == null)
-        {
-            return Unauthorized("Invalid Refresh Token.");
-        }
+    //    var user = _userRepository.FindUserByRefreshToken(refreshToken);
+    //    if (user == null)
+    //    {
+    //        return Unauthorized("Invalid Refresh Token.");
+    //    }
 
-        if (user.TokenExpires < DateTime.Now)
-        {
-            return Unauthorized("Token expired.");
-        }
+    //    if (user.TokenExpires < DateTime.Now)
+    //    {
+    //        return Unauthorized("Token expired.");
+    //    }
 
-        string token = CreateToken(user);
-        var newRefreshToken = GenerateRefreshToken();
-        SetRefreshToken(newRefreshToken, user);
+    //    string token = CreateToken(user);
+    //    var newRefreshToken = GenerateRefreshToken();
+    //    SetRefreshToken(newRefreshToken, user);
 
-        return Ok(new { token, newRefreshToken});
-    }
+    //    return Ok(new { token, newRefreshToken});
+    //}
 
-    private RefreshToken GenerateRefreshToken()
-    {
-        var refreshToken = new RefreshToken
-        {
-            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-            Expires = DateTime.Now.AddDays(7),
-            Created = DateTime.Now
-        };
+    //private RefreshToken GenerateRefreshToken()
+    //{
+    //    var refreshToken = new RefreshToken
+    //    {
+    //        Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+    //        Expires = DateTime.Now.AddDays(7),
+    //        Created = DateTime.Now
+    //    };
 
-        return refreshToken;
-    }
+    //    return refreshToken;
+    //}
 
-    private void SetRefreshToken(RefreshToken newRefreshToken, User user)
-    {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = false,
-            Expires = newRefreshToken.Expires
-        };
-        Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+    //private void SetRefreshToken(RefreshToken newRefreshToken, User user)
+    //{
+    //    var cookieOptions = new CookieOptions
+    //    {
+    //        HttpOnly = false,
+    //        Expires = newRefreshToken.Expires
+    //    };
+    //    Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
 
-        user.RefreshToken = newRefreshToken.Token;
-        user.TokenCreated = newRefreshToken.Created;
-        user.TokenExpires = newRefreshToken.Expires;
-        _userRepository.Save();
+    //    user.RefreshToken = newRefreshToken.Token;
+    //    user.TokenCreated = newRefreshToken.Created;
+    //    user.TokenExpires = newRefreshToken.Expires;
+    //    _userRepository.Save();
 
-    }
+    //}
 
     [Authorize]
     [HttpGet("logged")]
@@ -203,7 +203,7 @@ public class UserController : ControllerBase
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddSeconds(-290),
+            expires: DateTime.Now.AddDays(3),
             signingCredentials: cred
             );
 
