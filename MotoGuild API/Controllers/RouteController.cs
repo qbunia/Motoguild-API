@@ -13,13 +13,14 @@ namespace MotoGuild_API.Controllers;
 public class RouteController : ControllerBase
 {
     private readonly IMapper _mapper;
-
     private readonly IRouteRepository _routeRepository;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public RouteController(IRouteRepository routeRepository, IMapper mapper)
+    public RouteController(IRouteRepository routeRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _routeRepository = routeRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -56,8 +57,9 @@ public class RouteController : ControllerBase
     [HttpPost]
     public IActionResult CreateRoute([FromBody] CreateRouteDto createRouteDto)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
         var route = _mapper.Map<Route>(createRouteDto);
-        _routeRepository.Insert(route);
+        _routeRepository.Insert(route, userName);
         _routeRepository.Save();
         var routeDto = _mapper.Map<FullRouteDto>(route);
         return CreatedAtRoute("GetRoute", new {id = routeDto.Id}, routeDto);

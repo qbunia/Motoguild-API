@@ -50,9 +50,9 @@ public class CommentRepository : ICommentRepository
         return _context.Comments.Include(c => c.Author).ToList();
     }
 
-    public void Insert(Comment comment, int postId)
+    public void Insert(Comment comment, int postId, string userName)
     {
-        var user = _context.Users.FirstOrDefault(u => u.Id == comment.Author.Id);
+        var user = _context.Users.FirstOrDefault(u => u.UserName == userName);
         comment.Author = user;
         _context.Posts.Include(p => p.Comments).FirstOrDefault(p => p.Id == postId).Comments.Add(comment);
     }

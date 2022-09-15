@@ -8,7 +8,7 @@ public interface IRideRepository : IDisposable
     IEnumerable<Ride> GetAll(PaginationParams @params);
     Ride Get(int rideId);
     int TotalNumberOfRides();
-    void Insert(Ride ride);
+    void Insert(Ride ride, string userName);
     void Delete(int rideId);
     void Update(Ride ride);
     void Save();

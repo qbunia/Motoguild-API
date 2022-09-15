@@ -10,7 +10,7 @@ public interface IRouteRepository : IDisposable
     IEnumerable<Route> GetFiveOrderByRating(PaginationParams @params);
     int TotalNumberOfRoutes();
     Route Get(int routeId);
-    void Insert(Route route);
+    void Insert(Route route, string userName);
     void Delete(int routeId);
     void Update(Route route);
     void Save();

@@ -61,9 +61,9 @@ public class RouteRepository : IRouteRepository
             .FirstOrDefault(r => r.Id == id);
     }
 
-    public void Insert(Route route)
+    public void Insert(Route route, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == route.Owner.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         route.Owner = ownerFull;
         _context.Routes.Add(route);
     }

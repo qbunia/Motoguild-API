@@ -12,9 +12,9 @@ public interface IPostRepository : IDisposable
     IEnumerable<Post>? OrderedPost(IEnumerable<Post> posts);
     Post? Get(int postId);
     void InsertToFeed(Post post, int feedId, string userName);
-    void InsertToGroup(Post post, int groupId);
-    void InsertToRide(Post post, int rideId);
-    void InsertToRoute(Post post, int routeId);
+    void InsertToGroup(Post post, int groupId, string userName);
+    void InsertToRide(Post post, int rideId, string userName);
+    void InsertToRoute(Post post, int routeId, string userName);
     void Delete(int postId);
     void Update(Post post);
     void Save();
