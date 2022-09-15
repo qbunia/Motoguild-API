@@ -31,6 +31,10 @@ public class UserRepository : IUserRepository
     {
         return _context.Users.FirstOrDefault(u => u.UserName == name) != null;
     }
+    public bool UserEmailExist(string email)
+    {
+        return _context.Users.FirstOrDefault(u => u.Email == email) != null;
+    }
 
     public User GetUserByName(string name)
     {

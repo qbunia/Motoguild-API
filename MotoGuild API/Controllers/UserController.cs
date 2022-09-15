@@ -46,6 +46,10 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public IActionResult RegisterUser([FromBody] CreateUserDto createUserDto)
     {
+        if (_userRepository.UserNameExist(createUserDto.UserName) || _userRepository.UserEmailExist(createUserDto.Email))
+        {
+            return BadRequest("User already exists.");
+        }
         CreatePasswordHash(createUserDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
         var user = _mapper.Map<User>(createUserDto);
         user.PasswordHash = passwordHash;
