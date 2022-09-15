@@ -75,23 +75,23 @@ public class PostRepository : IPostRepository
         _context.Feed.Include(f => f.Posts).FirstOrDefault(f => f.Id == feedId).Posts.Add(post);
     }
 
-    public void InsertToGroup(Post post, int groupId)
+    public void InsertToGroup(Post post, int groupId, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         post.Author = ownerFull;
         _context.Groups.Include(g => g.Posts).FirstOrDefault(g => g.Id == groupId).Posts.Add(post);
     }
 
-    public void InsertToRide(Post post, int rideId)
+    public void InsertToRide(Post post, int rideId, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         post.Author = ownerFull;
         _context.Rides.Include(r => r.Posts).FirstOrDefault(r => r.Id == rideId).Posts.Add(post);
     }
 
-    public void InsertToRoute(Post post, int routeId)
+    public void InsertToRoute(Post post, int routeId, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         post.Author = ownerFull;
         _context.Routes.Include(r => r.Posts).FirstOrDefault(r => r.Id == routeId).Posts.Add(post);
     }

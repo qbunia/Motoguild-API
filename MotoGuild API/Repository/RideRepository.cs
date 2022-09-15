@@ -48,9 +48,9 @@ public class RideRepository : IRideRepository
             .FirstOrDefault(r => r.Id == id);
     }
 
-    public void Insert(Ride ride)
+    public void Insert(Ride ride, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == ride.Owner.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         ride.Owner = ownerFull;
         var routeFull = _context.Routes.Include(r => r.Owner).FirstOrDefault(r => r.Id == ride.Route.Id);
         ride.Route = routeFull;

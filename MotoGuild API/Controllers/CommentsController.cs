@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.CommentDtos;
 using MotoGuild_API.Repository.Interface;
@@ -11,12 +12,14 @@ namespace MotoGuild_API.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly ICommentRepository _commentRepository;
+    private readonly ILoggedUserRepository _loggedUserRepository;
     private readonly IMapper _mapper;
 
-    public CommentsController(ICommentRepository commentRepository, IMapper mapper)
+    public CommentsController(ICommentRepository commentRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _commentRepository = commentRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -41,12 +44,14 @@ public class CommentsController : ControllerBase
         return Ok(_mapper.Map<CommentDto>(comment));
     }
 
+    [Authorize]
     [HttpPost]
     public IActionResult CreatePostComment([FromBody] CreateCommentDto createCommentDto, int postId)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
         createCommentDto.CreateTime = DateTime.Now;
         var comment = _mapper.Map<Comment>(createCommentDto);
-        _commentRepository.Insert(comment, postId);
+        _commentRepository.Insert(comment, postId, userName);
         _commentRepository.Save();
         var commentDto = _mapper.Map<CommentDto>(comment);
         return CreatedAtRoute("GetPostComment", new {commentId = commentDto.Id, postId}, commentDto);

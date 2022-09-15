@@ -14,11 +14,14 @@ public class RideController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IRideRepository _rideRepository;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public RideController(IRideRepository rideRepository, IMapper mapper)
+    public RideController(IRideRepository rideRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _rideRepository = rideRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
+
     }
 
     [HttpGet]
@@ -42,8 +45,9 @@ public class RideController : ControllerBase
     [HttpPost]
     public IActionResult CreateRide([FromBody] CreateRideDto createRideDto, int rideId)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
         var ride = _mapper.Map<Ride>(createRideDto);
-        _rideRepository.Insert(ride);
+        _rideRepository.Insert(ride, userName);
         _rideRepository.Save();
         var rideDto = _mapper.Map<RideDto>(ride);
         return CreatedAtRoute("GetRide", new {id = rideDto.Id, rideId}, rideDto);
