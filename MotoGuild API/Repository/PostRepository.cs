@@ -68,9 +68,9 @@ public class PostRepository : IPostRepository
         return posts != null ? posts : Enumerable.Empty<Post>();
     }
 
-    public void InsertToFeed(Post post, int feedId)
+    public void InsertToFeed(Post post, int feedId,string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == post.Author.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         post.Author = ownerFull;
         _context.Feed.Include(f => f.Posts).FirstOrDefault(f => f.Id == feedId).Posts.Add(post);
     }

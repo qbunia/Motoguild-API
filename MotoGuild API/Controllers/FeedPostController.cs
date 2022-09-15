@@ -13,11 +13,13 @@ public class FeedPostController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IPostRepository _postRepository;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public FeedPostController(IPostRepository postRepositort, IMapper mapper)
+    public FeedPostController(IPostRepository postRepositort, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _postRepository = postRepositort;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -40,12 +42,14 @@ public class FeedPostController : ControllerBase
         return Ok(_mapper.Map<PostDto>(post));
     }
 
+    [Authorize]
     [HttpPost]
     public IActionResult CreateFeedPost(int feedId, [FromBody] CreatePostDto createPostDto)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
         createPostDto.CreateTime = DateTime.Now;
         var post = _mapper.Map<Post>(createPostDto);
-        _postRepository.InsertToFeed(post, feedId);
+        _postRepository.InsertToFeed(post, feedId, userName);
         _postRepository.Save();
         var postDto = _mapper.Map<PostDto>(post);
         return CreatedAtRoute("GetFeedPost", new {feedId, postId = postDto.Id}, postDto);
