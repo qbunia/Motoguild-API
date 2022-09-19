@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.UserDtos;
 using MotoGuild_API.Repository.Interface;
@@ -11,11 +12,14 @@ public class GroupPendingUsersController : ControllerBase
 {
     private readonly IGroupPendingUsersRepository _groupPendingUsersRepository;
     private readonly IMapper _mapper;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public GroupPendingUsersController(IGroupPendingUsersRepository groupPendingUsersRepository, IMapper mapper)
+    public GroupPendingUsersController(IGroupPendingUsersRepository groupPendingUsersRepository, IMapper mapper,
+        ILoggedUserRepository loggedUserRepository)
     {
         _groupPendingUsersRepository = groupPendingUsersRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -34,9 +38,12 @@ public class GroupPendingUsersController : ControllerBase
         return Ok(_mapper.Map<UserDto>(pendingUsers));
     }
 
+    [Authorize]
     [HttpPost("{id:int}")]
     public IActionResult AddGroupPendingUserByUserId(int groupId, int id)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        id = _groupPendingUsersRepository.GetUserId(userName);
         if (!_groupPendingUsersRepository.GroupExist(groupId) || !_groupPendingUsersRepository.UserExits(id))
             return NotFound();
 

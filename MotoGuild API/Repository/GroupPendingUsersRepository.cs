@@ -68,10 +68,15 @@ public class GroupPendingUsersRepository : IGroupPendingUsersRepository
         return group != null;
     }
 
-    public bool UserExits(int userId)
+    public bool UserExits(int id)
     {
-        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
         return user != null;
+    }
+    public int GetUserId(string name)
+    {
+        var userId = _context.Users.FirstOrDefault(u => u.UserName == name).Id;
+        return userId;
     }
 
     public bool UserInPendingUsers(int groupId, int userId)

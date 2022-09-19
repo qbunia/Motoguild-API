@@ -14,7 +14,8 @@ public class GroupParticipantsController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public GroupParticipantsController(IGroupParticipantsRepository groupParticipantsRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
+    public GroupParticipantsController(IGroupParticipantsRepository groupParticipantsRepository, 
+        IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _groupParticipantsRepository = groupParticipantsRepository;
         _mapper = mapper;

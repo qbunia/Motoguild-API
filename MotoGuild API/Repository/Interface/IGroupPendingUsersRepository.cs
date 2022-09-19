@@ -12,6 +12,7 @@ public interface IGroupPendingUsersRepository : IDisposable
     void DeletePendingUserByUserId(int groupId, int userId);
     void Update(User user);
     bool GroupExist(int groupId);
+    int GetUserId(string userName);
     bool UserExits(int userId);
     bool UserInPendingUsers(int groupId, int userId);
     void Save();
