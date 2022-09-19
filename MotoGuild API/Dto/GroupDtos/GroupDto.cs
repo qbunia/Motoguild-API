@@ -13,7 +13,16 @@ public class GroupDto
     public List<UserDto> Participants { get; set; }
     public List<UserDto> PendingUsers { get; set; }
     public List<PostDto> Posts { get; set; }
-    public double Rating { get; set; }
+    public double Rating
+    {
+        get { return Participants.Average(u => u.Rating); }
+        set
+        {
+            if (value < 0 || value > 5)
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "The valid rating is between 0 and 5.");
+        }
+    }
 }
 
 public class SelectedGroupDto
@@ -25,5 +34,14 @@ public class SelectedGroupDto
     public bool IsPrivate { get; set; }
     public DateTime CreationDate { get; set; }
     public List<UserDto> Participants { get; set; }
-    public double Rating { get; set; }
+    public double Rating
+    {
+        get { return Participants.Average(u => u.Rating); }
+        set
+        {
+            if (value < 0 || value > 5)
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    "The valid rating is between 0 and 5.");
+        }
+    }
 }
