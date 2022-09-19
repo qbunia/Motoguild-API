@@ -67,4 +67,20 @@ public class GroupParticipantsController : ControllerBase
 
         return NoContent();
     }
+
+    [Authorize]
+    [HttpDelete("logged")]
+    public IActionResult DeleteGroupParticipant(int groupId)
+    {
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        var id = _groupParticipantsRepository.GetUserByName(userName).Id;
+        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(userName))
+            return NotFound();
+
+        if (!_groupParticipantsRepository.UserInGroup(groupId, userName)) return NotFound();
+        _groupParticipantsRepository.DeleteParticipantByUserId(groupId, id);
+        _groupParticipantsRepository.Save();
+
+        return NoContent();
+    }
 }

@@ -147,9 +147,11 @@ public class UserController : ControllerBase
     [HttpGet("logged")]
     public IActionResult GetLogged()
     {
-        var user = _loggedUserRepository.GetLoggedUserName();
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        var user = _userRepository.GetUserByName(userName);
+        var userDto = _mapper.Map<UserDto>(user);
 
-        return Ok(user);
+        return Ok(userDto);
     }
 
 

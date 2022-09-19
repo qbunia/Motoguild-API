@@ -25,6 +25,7 @@ public class GroupRepository : IGroupRepository
             .Include(g => g.PendingUsers)
             .Include(g => g.Posts).ThenInclude(p => p.Author)
             .Skip((@params.Page - 1) * @params.ItemsPerPage)
+            .OrderByDescending(g=>g.Participants.Count)
             .Take(@params.ItemsPerPage)
             .ToList();
     }
