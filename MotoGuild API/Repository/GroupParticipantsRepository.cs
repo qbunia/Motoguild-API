@@ -36,6 +36,10 @@ public class GroupParticipantsRepository : IGroupParticipantsRepository
     {
         return _context.Users.Find(userId);
     }
+    public User GetUserByName(string name)
+    {
+        return _context.Users.FirstOrDefault(u=>u.UserName == name);
+    }
 
     public void AddParticipantByUserId(int groupId, int userId)
     {
@@ -44,6 +48,15 @@ public class GroupParticipantsRepository : IGroupParticipantsRepository
             .FirstOrDefault(g => g.Id == groupId);
         var user = _context.Users
             .FirstOrDefault(u => u.Id == userId);
+        group.Participants.Add(user);
+    }
+    public void AddParticipantByUserName(int groupId, string name)
+    {
+        var group = _context.Groups
+            .Include(g => g.Participants)
+            .FirstOrDefault(g => g.Id == groupId);
+        var user = _context.Users
+            .FirstOrDefault(u => u.UserName == name);
         group.Participants.Add(user);
     }
 
@@ -68,22 +81,29 @@ public class GroupParticipantsRepository : IGroupParticipantsRepository
         return group != null;
     }
 
-    public bool UserExits(int userId)
+    public bool UserExits(string name)
     {
-        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+        var user = _context.Users.FirstOrDefault(u => u.UserName == name);
         return user != null;
     }
 
-    public bool UserInGroup(int groupId, int userId)
+    public bool UserInGroup(int groupId, string userName)
     {
         var group = _context.Groups.Include(g => g.Participants).FirstOrDefault(g => g.Id == groupId);
         if (group != null)
         {
-            var participantsIds = group.Participants.Select(p => p.Id);
-            return participantsIds.Contains(userId);
+            var participantsNames = group.Participants.Select(p => p.UserName);
+            return participantsNames.Contains(userName);
         }
 
         return false;
+    }
+
+    public string GetUserName(int id)
+    {
+        var userName = string.Empty;
+        userName = _context.Users.FirstOrDefault(u => u.Id == id).UserName;
+        return userName;
     }
 
     public void Save()

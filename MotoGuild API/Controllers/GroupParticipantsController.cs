@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.UserDtos;
 using MotoGuild_API.Repository.Interface;
@@ -11,11 +12,13 @@ public class GroupParticipantsController : ControllerBase
 {
     private readonly IGroupParticipantsRepository _groupParticipantsRepository;
     private readonly IMapper _mapper;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public GroupParticipantsController(IGroupParticipantsRepository groupParticipantsRepository, IMapper mapper)
+    public GroupParticipantsController(IGroupParticipantsRepository groupParticipantsRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _groupParticipantsRepository = groupParticipantsRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -34,16 +37,17 @@ public class GroupParticipantsController : ControllerBase
         return Ok(_mapper.Map<UserDto>(participant));
     }
 
+    [Authorize]
     [HttpPost("{id:int}")]
     public IActionResult AddGroupParticipantByUserId(int groupId, int id)
     {
-        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(id))
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(userName))
             return NotFound();
-
-        if (_groupParticipantsRepository.UserInGroup(groupId, id)) return BadRequest();
-        _groupParticipantsRepository.AddParticipantByUserId(groupId, id);
+        if (_groupParticipantsRepository.UserInGroup(groupId, userName)) return BadRequest();
+        _groupParticipantsRepository.AddParticipantByUserName(groupId, userName);
         _groupParticipantsRepository.Save();
-        var user = _groupParticipantsRepository.GetUser(id);
+        var user = _groupParticipantsRepository.GetUserByName(userName);
         var userDto = _mapper.Map<UserDto>(user);
         return CreatedAtRoute("GetGroupParticipant", new {id = userDto.Id, groupId}, userDto);
     }
@@ -52,10 +56,11 @@ public class GroupParticipantsController : ControllerBase
     [HttpDelete("{id:int}")]
     public IActionResult DeleteGroupParticipantByUserId(int groupId, int id)
     {
-        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(id))
+        var userName = _groupParticipantsRepository.GetUserName(id);
+        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(userName))
             return NotFound();
 
-        if (!_groupParticipantsRepository.UserInGroup(groupId, id)) return NotFound();
+        if (!_groupParticipantsRepository.UserInGroup(groupId, userName)) return NotFound();
         _groupParticipantsRepository.DeleteParticipantByUserId(groupId, id);
         _groupParticipantsRepository.Save();
 
