@@ -53,7 +53,7 @@ public class GroupParticipantsController : ControllerBase
         return CreatedAtRoute("GetGroupParticipant", new {id = userDto.Id, groupId}, userDto);
     }
 
-
+    [Authorize]
     [HttpDelete("{id:int}")]
     public IActionResult DeleteGroupParticipantByUserId(int groupId, int id)
     {
