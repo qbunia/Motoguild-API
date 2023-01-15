@@ -92,13 +92,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
 
 app.UseCors();
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseRouting();
 app.UseAuthorization();
 
@@ -106,5 +106,5 @@ app.MapControllers();
 
 
 app.UseEndpoints(e => e.MapDefaultControllerRoute());
-app.MapFallbackToFile("index.html");
+//app.MapFallbackToFile("index.html");
 app.Run();

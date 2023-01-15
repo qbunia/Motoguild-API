@@ -18,11 +18,11 @@ public class CreateEventDto
 
     [Required]
     [DataType(DataType.DateTime)]
-    public DateTime Start { get; set; }
+    public DateTime StartDate { get; set; }
 
     [Required]
     [DataType(DataType.DateTime)]
-    public DateTime Stop { get; set; }
+    public DateTime StopDate { get; set; }
 
     public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
 }

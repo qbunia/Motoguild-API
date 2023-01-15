@@ -32,6 +32,7 @@ public class SelectedGroupDto
     public string Description { get; set; }
     public UserDto Owner { get; set; }
     public bool IsPrivate { get; set; }
+    public string GroupImage { get; set; }
     public DateTime CreationDate { get; set; }
     public List<UserDto> Participants { get; set; }
     public List<UserDto> PendingUsers { get; set; }

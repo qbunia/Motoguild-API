@@ -6,4 +6,6 @@ public interface ILoggedUserRepository
 {
     string GetLoggedUserName();
 
+    string GetLoggedUserData();
+
 }

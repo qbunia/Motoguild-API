@@ -16,6 +16,8 @@ namespace Domain
         public ICollection<Post> Posts { get; set; } = new List<Post>();
         public bool IsPrivate { get; set; }
         public DateTime? CreationDate { get; set; }
+        public string? GroupImage { get; set; }
         public ICollection<User> PendingUsers { get; set; } = new List<User>();
+        public double Rating { get; set; }
     }
 }

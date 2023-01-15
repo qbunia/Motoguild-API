@@ -12,6 +12,7 @@ public class CreateUserDto
     [EmailAddress]
     public string Email { get; set; }
 
+    [Required]
     public string Password { get; set; }
 
     [DataType(DataType.PhoneNumber)] public int? PhoneNumber { get; set; } = null;

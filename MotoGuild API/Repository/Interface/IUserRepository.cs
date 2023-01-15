@@ -6,7 +6,6 @@ public interface IUserRepository : IDisposable
 {
     IEnumerable<User> GetAll();
     User Get(int userId);
-
     bool UserNameExist(string name);
     bool UserEmailExist(string email);
 

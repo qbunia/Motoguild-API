@@ -42,6 +42,21 @@ public class GroupParticipantsController : ControllerBase
     [HttpPost("{id:int}")]
     public IActionResult AddGroupParticipantByUserId(int groupId, int id)
     {
+        var userName = _groupParticipantsRepository.GetUserName(id);
+        if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(userName))
+            return NotFound();
+        if (_groupParticipantsRepository.UserInGroup(groupId, userName)) return BadRequest();
+        _groupParticipantsRepository.AddParticipantByUserId(groupId, id);
+        _groupParticipantsRepository.Save();
+        var user = _groupParticipantsRepository.GetUserByName(userName);
+        var userDto = _mapper.Map<UserDto>(user);
+        return CreatedAtRoute("GetGroupParticipant", new {id = userDto.Id, groupId}, userDto);
+    }
+
+    [Authorize]
+    [HttpPost("logged")]
+    public IActionResult AddLoggedGroupParticipant(int groupId)
+    {
         var userName = _loggedUserRepository.GetLoggedUserName();
         if (!_groupParticipantsRepository.GroupExist(groupId) || !_groupParticipantsRepository.UserExits(userName))
             return NotFound();
@@ -50,7 +65,7 @@ public class GroupParticipantsController : ControllerBase
         _groupParticipantsRepository.Save();
         var user = _groupParticipantsRepository.GetUserByName(userName);
         var userDto = _mapper.Map<UserDto>(user);
-        return CreatedAtRoute("GetGroupParticipant", new {id = userDto.Id, groupId}, userDto);
+        return CreatedAtRoute("GetGroupParticipant", new { id = userDto.Id, groupId }, userDto);
     }
 
     [Authorize]

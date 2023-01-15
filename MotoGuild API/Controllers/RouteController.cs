@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using AutoMapper;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.RouteDtos;
 using MotoGuild_API.Helpers;

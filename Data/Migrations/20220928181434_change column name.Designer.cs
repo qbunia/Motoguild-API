@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(MotoGuildDbContext))]
-    partial class MotoGuildDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220928181434_change column name")]
+    partial class changecolumnname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,10 +77,10 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("StopDate")
+                    b.Property<DateTime>("Stop")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("UserId")
@@ -121,9 +123,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("GroupImage")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("bit");
 
@@ -133,9 +132,6 @@ namespace Data.Migrations
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
-
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
@@ -147,6 +143,26 @@ namespace Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Domain.ImageUpload", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("InsertedOn")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("imageName")
+                        .IsRequired()
+                        .HasColumnType("varchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImageUploads");
                 });
 
             modelBuilder.Entity("Domain.Post", b =>

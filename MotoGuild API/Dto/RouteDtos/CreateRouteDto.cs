@@ -1,4 +1,5 @@
-﻿using MotoGuild_API.Dto.UserDtos;
+﻿using MotoGuild_API.Dto.StopDtos;
+using MotoGuild_API.Dto.UserDtos;
 
 namespace MotoGuild_API.Dto.RouteDtos;
 
@@ -10,4 +11,7 @@ public class CreateRouteDto
     public string EndingPlace { get; set; }
     public int Rating { get; set; }
     public UserDto Owner { get; set; }
+
+    public List<CreateStopDto> Stops { get; set; }
+
 }

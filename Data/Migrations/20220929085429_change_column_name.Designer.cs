@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(MotoGuildDbContext))]
-    partial class MotoGuildDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929085429_change_column_name")]
+    partial class change_column_name
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,9 +135,6 @@ namespace Data.Migrations
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
-
-                    b.Property<double>("Rating")
-                        .HasColumnType("float");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");

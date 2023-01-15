@@ -37,6 +37,11 @@ public class RideParticipantsRepository : IRideParticipantsRepository
         return _context.Users.Find(userId);
     }
 
+    public User GetUserByName(string userName)
+    {
+        return _context.Users.FirstOrDefault(u => u.UserName == userName);
+    }
+
     public void AddParticipantByUserId(int rideId, int userId)
     {
         var ride = _context.Rides
@@ -47,6 +52,16 @@ public class RideParticipantsRepository : IRideParticipantsRepository
         ride.Participants.Add(user);
     }
 
+    public void AddParticipantByUserName(int rideId, string userName)
+    {
+        var ride = _context.Rides
+            .Include(g => g.Participants)
+            .FirstOrDefault(g => g.Id == rideId);
+        var user = _context.Users
+            .FirstOrDefault(u => u.UserName == userName);
+        ride.Participants.Add(user);
+    }
+
     public void DeleteParticipantByUserId(int rideId, int userId)
     {
         var ride = _context.Rides
@@ -54,6 +69,16 @@ public class RideParticipantsRepository : IRideParticipantsRepository
             .FirstOrDefault(g => g.Id == rideId);
         var user = _context.Users
             .FirstOrDefault(u => u.Id == userId);
+        ride.Participants.Remove(user);
+    }
+
+    public void DeleteParticipantByUserName(int rideId, string userName)
+    {
+        var ride = _context.Rides
+            .Include(g => g.Participants)
+            .FirstOrDefault(g => g.Id == rideId);
+        var user = _context.Users
+            .FirstOrDefault(u => u.UserName == userName);
         ride.Participants.Remove(user);
     }
 
@@ -74,6 +99,12 @@ public class RideParticipantsRepository : IRideParticipantsRepository
         return user != null;
     }
 
+    public bool UserExits(string userName)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.UserName == userName);
+        return user != null;
+    }
+
     public bool UserInRide(int rideId, int userId)
     {
         var ride = _context.Rides.Include(g => g.Participants).FirstOrDefault(g => g.Id == rideId);
@@ -81,6 +112,18 @@ public class RideParticipantsRepository : IRideParticipantsRepository
         {
             var participantsIds = ride.Participants.Select(p => p.Id);
             return participantsIds.Contains(userId);
+        }
+
+        return false;
+    }
+
+    public bool UserInRide(int rideId, string userName)
+    {
+        var ride = _context.Rides.Include(g => g.Participants).FirstOrDefault(g => g.Id == rideId);
+        if (ride != null)
+        {
+            var participantsIds = ride.Participants.Select(p => p.UserName);
+            return participantsIds.Contains(userName);
         }
 
         return false;

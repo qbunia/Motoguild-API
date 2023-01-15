@@ -16,8 +16,8 @@ namespace Domain
         public string Description { get; set; }
         public ICollection<User> Participants { get; set; } = new List<User>();
         public string Place { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime Stop { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime StopDate { get; set; }
         public ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }

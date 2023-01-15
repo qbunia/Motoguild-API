@@ -6,7 +6,7 @@ public class UserDto
     public string UserName { get; set; }
     public string Email { get; set; }
     public double Rating { get; set; }
-
+    public string? Image { get; set; }
     public override bool Equals(object? obj)
     {
         if (obj == null) return false;

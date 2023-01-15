@@ -11,8 +11,8 @@ public class EventDto
     public string Description { get; set; } = string.Empty;
     public ICollection<UserDto>? Participants { get; set; } = new List<UserDto>();
     public string Place { get; set; } = string.Empty;
-    public DateTime Start { get; set; }
-    public DateTime Stop { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime StopDate { get; set; }
     public ICollection<PostDto> Posts { get; set; } = new List<PostDto>();
 }
 

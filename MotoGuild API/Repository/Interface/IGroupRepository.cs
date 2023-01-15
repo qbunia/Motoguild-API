@@ -8,7 +8,7 @@ public interface IGroupRepository : IDisposable
     IEnumerable<Group> GetAll(PaginationParams @params);
     int TotalNumberOfGroups();
     Group Get(int groupId);
-    void Insert(Group group);
+    void Insert(Group group, string userName);
     void Delete(int groupId);
     void Update(Group group);
     void Save();

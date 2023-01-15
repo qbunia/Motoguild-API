@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.UserDtos;
 using MotoGuild_API.Repository.Interface;
@@ -11,11 +12,13 @@ public class RideParticipantsController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IRideParticipantsRepository _rideParticipantsRepository;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public RideParticipantsController(IRideParticipantsRepository rideParticipantsRepository, IMapper mapper)
+    public RideParticipantsController(IRideParticipantsRepository rideParticipantsRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _rideParticipantsRepository = rideParticipantsRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -34,29 +37,33 @@ public class RideParticipantsController : ControllerBase
         return Ok(_mapper.Map<UserDto>(participant));
     }
 
-    [HttpPost("{id:int}")]
-    public IActionResult AddRideParticipantByUserId(int rideId, int id)
+
+    [Authorize]
+    [HttpPost("logged")]
+    public IActionResult AddRideParticipantLogged(int rideId)
     {
-        if (!_rideParticipantsRepository.RideExist(rideId) || !_rideParticipantsRepository.UserExits(id))
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        if (!_rideParticipantsRepository.RideExist(rideId) || !_rideParticipantsRepository.UserExits(userName))
             return NotFound();
 
-        if (_rideParticipantsRepository.UserInRide(rideId, id)) return BadRequest();
-        _rideParticipantsRepository.AddParticipantByUserId(rideId, id);
+        if (_rideParticipantsRepository.UserInRide(rideId, userName)) return BadRequest();
+        _rideParticipantsRepository.AddParticipantByUserName(rideId, userName);
         _rideParticipantsRepository.Save();
-        var user = _rideParticipantsRepository.GetUser(id);
+        var user = _rideParticipantsRepository.GetUserByName(userName);
         var userDto = _mapper.Map<UserDto>(user);
-        return CreatedAtRoute("GetRideParticipant", new {id = userDto.Id, rideId}, userDto);
+        return CreatedAtRoute("GetRideParticipant", new { id = userDto.Id, rideId }, userDto);
     }
 
-
-    [HttpDelete("{id:int}")]
-    public IActionResult DeleteRideParticipantByUserId(int rideId, int id)
+    [Authorize]
+    [HttpDelete("logged")]
+    public IActionResult DeleteRideParticipantLogged(int rideId)
     {
-        if (!_rideParticipantsRepository.RideExist(rideId) || !_rideParticipantsRepository.UserExits(id))
+        var userName = _loggedUserRepository.GetLoggedUserName();
+        if (!_rideParticipantsRepository.RideExist(rideId) || !_rideParticipantsRepository.UserExits(userName))
             return NotFound();
 
-        if (!_rideParticipantsRepository.UserInRide(rideId, id)) return NotFound();
-        _rideParticipantsRepository.DeleteParticipantByUserId(rideId, id);
+        if (!_rideParticipantsRepository.UserInRide(rideId, userName)) return NotFound();
+        _rideParticipantsRepository.DeleteParticipantByUserName(rideId, userName);
         _rideParticipantsRepository.Save();
 
         return NoContent();

@@ -17,6 +17,10 @@ public class LoggedUserRepository : ILoggedUserRepository
         _httpContextAccessor = httpContextAccessor;
     }
 
+    public string GetLoggedUserData()
+    {
+        throw new NotImplementedException();
+    }
 
     public string GetLoggedUserName()
     {

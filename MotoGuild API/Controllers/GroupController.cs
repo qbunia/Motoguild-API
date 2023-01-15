@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using AutoMapper;
 using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MotoGuild_API.Dto.GroupDtos;
 using MotoGuild_API.Helpers;
@@ -14,11 +15,13 @@ public class GroupController : ControllerBase
 {
     private readonly IGroupRepository _groupRepository;
     private readonly IMapper _mapper;
+    private readonly ILoggedUserRepository _loggedUserRepository;
 
-    public GroupController(IGroupRepository groupRepository, IMapper mapper)
+    public GroupController(IGroupRepository groupRepository, IMapper mapper, ILoggedUserRepository loggedUserRepository)
     {
         _groupRepository = groupRepository;
         _mapper = mapper;
+        _loggedUserRepository = loggedUserRepository;
     }
 
     [HttpGet]
@@ -39,11 +42,17 @@ public class GroupController : ControllerBase
         return Ok(_mapper.Map<SelectedGroupDto>(group));
     }
 
+    [Authorize]
     [HttpPost]
     public IActionResult CreateGroup([FromBody] CreateGroupDto createGroupDto)
     {
+        var userName = _loggedUserRepository.GetLoggedUserName();
         var group = _mapper.Map<Group>(createGroupDto);
-        _groupRepository.Insert(group);
+        if (group.GroupImage == "")
+        {
+            group.GroupImage = null;
+        }
+        _groupRepository.Insert(group, userName);
         _groupRepository.Save();
         var groupDto = _mapper.Map<SelectedGroupDto>(group);
         return CreatedAtRoute("GetGroup", new {id = groupDto.Id}, groupDto);

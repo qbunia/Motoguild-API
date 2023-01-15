@@ -24,8 +24,8 @@ public class GroupRepository : IGroupRepository
             .Include(g => g.Participants)
             .Include(g => g.PendingUsers)
             .Include(g => g.Posts).ThenInclude(p => p.Author)
+            .OrderByDescending(g => g.Participants.Count)
             .Skip((@params.Page - 1) * @params.ItemsPerPage)
-            .OrderByDescending(g=>g.Participants.Count)
             .Take(@params.ItemsPerPage)
             .ToList();
     }
@@ -44,9 +44,9 @@ public class GroupRepository : IGroupRepository
             .FirstOrDefault(g => g.Id == id);
     }
 
-    public void Insert(Group group)
+    public void Insert(Group group, string userName)
     {
-        var ownerFull = _context.Users.FirstOrDefault(u => u.Id == group.Owner.Id);
+        var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
         group.Owner = ownerFull;
         _context.Groups.Add(group);
         group.Participants.Add(group.Owner);

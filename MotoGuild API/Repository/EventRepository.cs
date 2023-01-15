@@ -1,6 +1,7 @@
 ﻿using Data;
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using MotoGuild_API.Helpers;
 using MotoGuild_API.Repository.Interface;
 
 namespace MotoGuild_API.Repository;
@@ -16,12 +17,18 @@ public class EventRepository : IEventRepository
         _context = context;
     }
 
-    public IEnumerable<Event> GetAll()
+    public int TotalNumberOfEvents()
+    {
+        return _context.Events.Count();
+    }
+    public IEnumerable<Event> GetAll(PaginationParams @params)
     {
         return _context.Events
             .Include(g => g.Owner)
             //.Include(g => g.Participants)
-            //.Include(g => g.Posts)                
+            //.Include(g => g.Posts)
+            .Skip((@params.Page - 1) * @params.ItemsPerPage)
+            .Take(@params.ItemsPerPage)
             .ToList();
     }
 
@@ -69,4 +76,5 @@ public class EventRepository : IEventRepository
                 _context.Dispose();
         disposed = true;
     }
+
 }
