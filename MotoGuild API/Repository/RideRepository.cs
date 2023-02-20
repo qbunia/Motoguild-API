@@ -28,7 +28,7 @@ public class RideRepository : IRideRepository
             .Include(r => r.Route).ThenInclude(i => i.Stops)
             .Skip((@params.Page - 1) * @params.ItemsPerPage)
             .Take(@params.ItemsPerPage)
-            .ToList();
+            .ToList(); //dajesz ToList co listuje obiekty ale zwracasz enumrable tak jakbys uzytkownikowi dawal do zrozumienia ze moze enumeorwać po kolekcji a ToList powoduje ze nie moze po niej enumerować. Mysle ze typ zwracany powinien wtedy być Lista albo lepiej Arrayem bo nie chcesz go modyfikowac. 
     }
 
     public int TotalNumberOfRides()
@@ -51,7 +51,7 @@ public class RideRepository : IRideRepository
     public void Insert(Ride ride, string userName)
     {
         var ownerFull = _context.Users.FirstOrDefault(u => u.UserName == userName);
-        ride.Owner = ownerFull;
+        ride.Owner = ownerFull; //Zalozmy ze ownerFull jest null bo nie znalazl go w bazie danych. Czy nie wywali sie wtedy apka?
         var routeFull = _context.Routes.Include(r => r.Owner).FirstOrDefault(r => r.Id == ride.Route.Id);
         ride.Route = routeFull;
         _context.Rides.Add(ride);
