@@ -106,5 +106,5 @@ app.MapControllers();
 
 
 app.UseEndpoints(e => e.MapDefaultControllerRoute());
-//app.MapFallbackToFile("index.html");
+//app.MapFallbackToFile("index.html"); //nie potrzebny komentarz
 app.Run();
