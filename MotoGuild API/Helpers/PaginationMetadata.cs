@@ -1,4 +1,4 @@
-﻿namespace MotoGuild_API.Helpers;
+﻿namespace MotoGuild_API.Helpers; //Nie twórz nigdy folderu/namespace Helpers bo to jest worek bez dna. Tam będą wszsycy wrzucać cokolwiek i to bedzie bez sensu. Lepiej zrobić osobne foldery dotyczące stronnicowania, mapowania / inicjalizacji, autoryzacji -> Refresh 
 
 public class PaginationMetadata
 {
